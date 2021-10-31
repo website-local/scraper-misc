@@ -1,7 +1,7 @@
 {
-  "name": "mdn-local",
+  "name": "scraper-misc",
   "version": "0.2.2",
-  "description": "create offline mozilla developer network documents",
+  "description": "scraper of websites which do not need a lot of transformation",
   "main": "index.js",
   "engines": {
     "node": ">=12.16.0"
