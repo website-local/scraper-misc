@@ -129,6 +129,7 @@ lifeCycle.processAfterDownload.unshift(processHtml(preProcessHtml));
 
 
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
+options.deduplicateStripSearch = false;
 options.logSubDir = HOST;
 options.maxDepth = 7;
 options.concurrency = 15;
