@@ -872,7 +872,7 @@ Prism.languages.insertBefore('cpp', 'string', {
 Prism.highlightAll();
 
 /* align blocks */
-!function () {
+(function alignBlocks() {
   var contentLeft, contentRight, alignLength, i, l, r, tl, tr, d,
     detailsLeft, detailsRight;
   function align() {
@@ -946,4 +946,5 @@ Prism.highlightAll();
   detailsRight.addEventListener('toggle', function () {
     detailsLeft.open = detailsRight.open;
   });
-}();
+  window.addEventListener('resize', alignBlocks);
+})();
