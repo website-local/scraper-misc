@@ -1,15 +1,12 @@
-import { join } from 'path';
+import {join} from 'path';
 import URI from 'urijs';
-import got from 'got';
 import type {Resource} from 'website-scrap-engine/lib/resource';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {error as errorLogger} from 'website-scrap-engine/lib/logger/logger';
 import type {
-  ProcessingLifeCycle,
-  ProcessResourceAfterDownloadFunc
-} from 'website-scrap-engine/lib/life-cycle/types';
-import type {
   DownloadResource,
+  ProcessingLifeCycle,
+  ProcessResourceAfterDownloadFunc,
   ProcessResourceBeforeDownloadFunc,
   SubmitResourceFunc
 } from 'website-scrap-engine/lib/life-cycle/types';
@@ -26,162 +23,22 @@ import {
   StaticDownloadOptions
 } from 'website-scrap-engine/lib/options';
 import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
-
-const gotNoRedirect = got.extend({
-  followRedirect: false
-});
-
-const cache: Record<string, string> = {};
-const asyncRedirectCache: Record<string, Promise<string>> = {};
-
-const KW_ARR_BEGIN = 'var arr = [',
-  KW_ARR_END = '];',
-  KW_ARR_INDEX_BEGIN = 'location.replace(arr[';
+import type {
+  PipelineExecutor
+} from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
+import type {DownloaderWithMeta} from 'website-scrap-engine/lib/downloader/types';
+import {decryptContent} from './decrypt-contents';
+import {
+  cache,
+  cachedGetRedirectLocation,
+  hardCodedRedirect,
+  hardCodedRedirectFullPath,
+  initNodeApiPath
+} from './fix-link';
 
 const HOST = 'nodejs.cn',
   PROTOCOL = 'http',
   URL_PREFIX = `${PROTOCOL}://${HOST}`;
-
-const LOCATION_REPLACE_LITERAL = 'location.replace(\'',
-  LOCATION_REPLACE_LITERAL_END = '\')';
-
-
-const getRedirectLocation = async (
-  link: string,
-  options: StaticDownloadOptions
-): Promise<string> => {
-  // make sure that followRedirect is false here
-  const theGot = options?.req ? got.extend(options.req, {
-    followRedirect: false
-  }) : gotNoRedirect;
-  const redirect = await theGot(
-    link.startsWith('/s') ? URL_PREFIX + link : link);
-  if (redirect.statusCode === 302 && redirect.headers?.location) {
-    cache[link] = redirect.headers.location;
-    link = redirect.headers.location;
-  } else if (redirect.body) {
-    /**
-     * @type string
-     */
-    const html = redirect.body;
-    const arrBegin = html.indexOf(KW_ARR_BEGIN),
-      arrEnd = html.indexOf(KW_ARR_END, arrBegin),
-      arrIndex = html.indexOf(KW_ARR_INDEX_BEGIN, arrEnd);
-    if (arrBegin > 0 && arrEnd > 0 && arrIndex > 0) {
-      try {
-        const arr = JSON.parse(html.slice(
-          arrBegin + KW_ARR_BEGIN.length - 1, arrEnd + 1));
-        const i = parseInt(html.slice(
-          arrIndex + KW_ARR_INDEX_BEGIN.length), 10);
-        if (arr && !isNaN(i) && arr[i]) {
-          cache[link] = arr[i];
-          link = arr[i];
-        } else {
-          errorLogger.warn('Can not parse redirect for', link, arr, i);
-        }
-      } catch (e) {
-        errorLogger.error('Error resolving redirect result', link, html, e);
-      }
-    } else {
-      // the new redirect page since 2021
-      const literalBegin = html.indexOf(LOCATION_REPLACE_LITERAL),
-        literalEnd = literalBegin > 0 ?
-          html.indexOf(LOCATION_REPLACE_LITERAL_END, literalBegin) : -1;
-      if (literalBegin > 0 && literalEnd > 0) {
-        link = html.slice(
-          literalBegin + LOCATION_REPLACE_LITERAL.length, literalEnd);
-      } else {
-        errorLogger.warn('Unknown redirect result format', link, html);
-      }
-    }
-  }
-  // replace the api to required version
-  if (options?.meta?.nodeApiPath) {
-    link = link.replace(`${URL_PREFIX}/api/`,
-      `${URL_PREFIX}/${options.meta.nodeApiPath}/`);
-  }
-  return link;
-};
-
-const cachedGetRedirectLocation = (
-  link: string, options: StaticDownloadOptions
-): string | Promise<string> => {
-  if (cache[link]) {
-    return cache[link];
-  }
-  if (asyncRedirectCache[link] !== undefined) {
-    return asyncRedirectCache[link];
-  }
-  return asyncRedirectCache[link] = getRedirectLocation(link, options);
-};
-
-// the 404-not-found links
-const hardCodedRedirect: Record<string, string> = {
-  '/api/stream.md': '/api/stream.html',
-  '/api/http/net.html': '/api/net.html',
-  '/api/fs/stream.html': '/api/stream.html',
-  '/api/addons/n-api.html': '/api/n-api.html',
-  '/api/assert/tty.html': '/api/tty.html',
-  '/api/worker_threads/errors.html': '/api/errors.html',
-  '/api/process/cli.html': '/api/cli.html',
-  '/api/zlib/buffer.html': '/api/buffer.html',
-  '/api/dgram/errors.html': '/api/errors.html',
-  '/api/net/stream.html': '/api/stream.html',
-  '/api/process/stream.html': '/api/stream.html',
-  '/api/worker_threads/fs.html': '/api/fs.html',
-  // 14.12.0
-  '/api/synopsis/cli.html': '/api/cli.html',
-  // since 16.3.0
-  '/api/modules/esm.md': '/api/esm.html'
-};
-
-const hardCodedRedirectFullPath: Record<string, string> = {
-  // 14.9.0
-  // http://nodejs.cn/api/module.html
-  'http://nodejs.cn/api/modules_cjs.html#modules_cjs_the_module_wrapper':
-    'http://nodejs.cn/api/modules.html#modules_the_module_wrapper',
-  // 14.9.0
-  // http://nodejs.cn/api/module.html
-  'http://nodejs.cn/api/modules_module.html#modules_module_class_module_sourcemap':
-    'http://nodejs.cn/api/module.html#module_class_module_sourcemap',
-  // 14.9.0
-  // http://nodejs.cn/api/module.html
-  'http://nodejs.cn/api/modules/modules_module.html#modules_module_the_module_object':
-    'http://nodejs.cn/api/module.html#module_the_module_object',
-  'http://nodejs.cn/api/wiki.openssl.org/index.php/List_of_SSL_OP_Flags#Table_of_Options':
-    'https://wiki.openssl.org/index.php/List_of_SSL_OP_Flags#Table_of_Options',
-  // 16.4.0
-  '/api/http_new_agent_options':
-    'http://nodejs.cn/api/http.html#http_new_agent_options'
-};
-
-const redirectCache: Record<string, Record<string, string>> = {};
-const redirectFullPathCache: Record<string, Record<string, string>> = {};
-
-const getRedirectCached = (
-  cache: typeof redirectCache, base: Record<string, string>
-) => (options?: StaticDownloadOptions): Record<string, string> => {
-  const nodeApiPath = options?.meta?.nodeApiPath as string | undefined;
-  let result: Record<string, string>;
-  if (nodeApiPath) {
-    result = cache[nodeApiPath];
-    if (!result) {
-      result = {};
-      const search = /\/api\//;
-      const replace = `/${nodeApiPath}/`;
-      for (const [k, v] of Object.entries(base)) {
-        result[k.replace(search, replace)] = v.replace(search, replace);
-      }
-      cache[nodeApiPath] = result;
-    }
-    return result;
-  }
-  return base;
-};
-
-const getRedirect = getRedirectCached(redirectCache, hardCodedRedirect);
-const getRedirectFullPath = getRedirectCached(
-  redirectFullPathCache, hardCodedRedirectFullPath);
 
 const linkRedirectFunc = async (
   link: string,
@@ -231,7 +88,7 @@ const linkRedirectFunc = async (
       }
     }
   }
-  const redirectLink = getRedirectFullPath(options)[link];
+  const redirectLink = hardCodedRedirectFullPath[link];
   if (redirectLink) {
     link = redirectLink;
   }
@@ -255,7 +112,7 @@ const linkRedirectFunc = async (
     u.path(pathArr.join('/'));
     link = u.toString();
   }
-  const redirect = getRedirect(options);
+  const redirect = hardCodedRedirect;
   if (redirect[u.path()]) {
     u = u.path(redirect[u.path()]);
     link = u.toString();
@@ -313,11 +170,11 @@ const preProcessResource = (
   }
 };
 
-const preProcessHtml: ProcessResourceAfterDownloadFunc = (
+const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   res: DownloadResource,
   submit: SubmitResourceFunc,
   options: StaticDownloadOptions
-): DownloadResource => {
+): Promise<DownloadResource> => {
   if (res.type !== ResourceType.Html) {
     return res;
   }
@@ -327,13 +184,18 @@ const preProcessHtml: ProcessResourceAfterDownloadFunc = (
   const $ = res.meta.doc;
   const head = $('head'), body = $('body');
   // remove comments in body
-  // note the 'this' hack, nodeType is actually defined
-  body.contents().filter(function (this: { nodeType: number }) {
+  body.contents().filter(function (this) {
     return this.nodeType === 8;
   }).remove();
+
+  // decrypt the stuffs behind login wall
+  await decryptContent($, res.url, options);
+
   $('#biz_nav').remove();
   $('#biz_content').remove();
   $('#biz_item').remove();
+  // login stuff
+  $('#btn_login,#btn_logout,#wxcode_box').remove();
   // remove all scripts
   $('script').remove();
   $('a[href="/"]').remove();
@@ -360,6 +222,12 @@ const preProcessHtml: ProcessResourceAfterDownloadFunc = (
   $('<link rel="icon" sizes="32x32" type="image/png" ' +
     `href="${URL_PREFIX}/${api}/static/favicon.png">`).appendTo(head);
 
+  if (api && api !== 'api' && options?.meta?.replaceNodeApiPath) {
+    const el = $('#alt-docs').parent().parent();
+    if (el.is('li.picker-header')) {
+      el.remove();
+    }
+  }
   return res;
 };
 
@@ -397,7 +265,18 @@ const postProcessSavePath = (
   return res;
 };
 
+const initNodeApiPathFromOptions = (
+  pipeline: PipelineExecutor, downloader?: DownloaderWithMeta
+) => {
+  const options = downloader?.options;
+  const api = options?.meta?.nodeApiPath;
+  if (api && typeof api === 'string') {
+    initNodeApiPath(api);
+  }
+};
+
 const lifeCycle: ProcessingLifeCycle = defaultLifeCycle();
+lifeCycle.init.push(initNodeApiPathFromOptions);
 lifeCycle.linkRedirect.push(skipProcess(
   (link: string) => !link || link.startsWith('https://github.com/')));
 lifeCycle.linkRedirect.push(linkRedirectFunc);
