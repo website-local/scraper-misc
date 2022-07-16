@@ -18,3 +18,4 @@ eslint.cmd
 *.log
 dest
 lib
+out
