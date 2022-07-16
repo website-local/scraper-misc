@@ -22,7 +22,8 @@
   --red1: #d60027;
   --red2: #d50027;
   --red3: #ca5010;
-  --green1: #43853d;
+  --red4: #ff7070;
+  --green1: #3e7a38;
   --green2: #5a8147;
   --green3: #64de64;
   --green4: #99cc7d;
@@ -39,6 +40,7 @@
   --background-color-highlight: var(--white-smoke);
   --color-brand-primary: var(--gray6);
   --color-brand-secondary: var(--green1);
+  --color-critical: var(--red1);
   --color-fill-app: var(--white);
   --color-fill-side-nav: var(--gray6);
   --color-links: var(--green1);
@@ -48,8 +50,19 @@
   --color-text-secondary: var(--green2)
 }
 
+h4 :target, h5 :target {
+  scroll-margin-top: 55px
+}
+
+@supports not (content-visibility:auto) {
+  h3 :target {
+    scroll-margin-top: 55px
+  }
+}
+
 .dark-mode {
   --background-color-highlight: var(--black2);
+  --color-critical: var(--red4);
   --color-fill-app: var(--black1);
   --color-fill-side-nav: var(--black3);
   --color-links: var(--green5);
@@ -167,61 +180,79 @@ em code {
   margin-bottom: 1rem
 }
 
-#gtoc ul {
+#gtoc > ul {
   list-style: none;
   margin-left: 0;
   line-height: 1.5rem
 }
 
-#gtoc > ul > li {
-  display: inline;
-  border-right: 1px solid currentColor;
-  margin-right: .4rem;
-  padding-right: .4rem
+.critical, .critical code {
+  color: var(--color-critical)
 }
 
-#gtoc > ul > li:last-child {
-  border-right: none;
-  margin-right: 0;
-  padding-right: 0
-}
-
-li.version-picker {
+li.picker-header {
   position: relative
 }
 
-li.version-picker:hover > a {
+li.picker-header .collapsed-arrow, li.picker-header .expanded-arrow {
+  width: 1.5ch;
+  height: 1.5em
+}
+
+li.picker-header .collapsed-arrow {
+  display: inline-block
+}
+
+:root:not(.has-js) li.picker-header:hover .collapsed-arrow, li.picker-header .expanded-arrow, li.picker-header.expanded .collapsed-arrow {
+  display: none
+}
+
+:root:not(.has-js) li.picker-header:hover .expanded-arrow, li.picker-header.expanded .expanded-arrow {
+  display: inline-block
+}
+
+:root:not(.has-js) li.picker-header:hover > a, li.picker-header.expanded > a {
   border-radius: 2px 2px 0 0
 }
 
-li.version-picker:hover > ol {
+:root:not(.has-js) li.picker-header:hover > .picker, li.picker-header.expanded > .picker {
   display: block;
   z-index: 1
 }
 
-li.version-picker a span {
+li.picker-header a span {
   font-size: .7rem
 }
 
-ol.version-picker {
+.picker {
   background-color: var(--color-fill-app);
   border: 1px solid var(--color-brand-secondary);
   border-radius: 0 0 2px 2px;
   display: none;
   list-style: none;
   position: absolute;
-  right: 0;
+  left: 0;
   top: 100%;
-  width: 100%
+  width: max-content;
+  min-width: min(300px, 75vw);
+  max-width: 75vw;
+  max-height: min(600px, 60vh);
+  overflow-y: auto
 }
 
-#gtoc ol.version-picker li {
+.picker > ol, .picker > ul {
+  list-style: none;
+  margin-left: 0;
+  line-height: 1.5rem
+}
+
+.picker li {
   display: block;
   border-right: 0;
   margin-right: 0
 }
 
-ol.version-picker li a {
+.picker li a {
   border-radius: 0;
   display: block;
   margin: 0;
@@ -229,15 +260,28 @@ ol.version-picker li a {
   padding-left: 1rem
 }
 
-ol.version-picker li:last-child a {
+.picker li a.active, .picker li a.active:focus, .picker li a.active:hover {
+  font-weight: 700
+}
+
+.picker li:last-child a {
   border-bottom-right-radius: 1px;
   border-bottom-left-radius: 1px
+}
+
+.gtoc-picker-header {
+  display: none
 }
 
 .line {
   width: calc(100% - 1rem);
   display: block;
   padding-bottom: 1px
+}
+
+.picker .line {
+  margin: 0;
+  width: 100%
 }
 
 .api_stability {
@@ -487,6 +531,41 @@ hr {
   margin-top: .666rem
 }
 
+.toc ul {
+  margin: 0
+}
+
+.toc li a:before {
+  content: "\25A0";
+  color: var(--color-text-primary);
+  padding-right: 1em;
+  font-size: .9em
+}
+
+.toc li a:hover:before {
+  color: var(--white)
+}
+
+.toc ul ul a {
+  padding-left: 1rem
+}
+
+.toc ul ul ul a {
+  padding-left: 2rem
+}
+
+.toc ul ul ul ul a {
+  padding-left: 3rem
+}
+
+.toc ul ul ul ul ul a {
+  padding-left: 4rem
+}
+
+.toc ul ul ul ul ul ul a {
+  padding-left: 5rem
+}
+
 #toc .stability_0:after {
   background-color: var(--red2);
   content: "deprecated"
@@ -696,10 +775,50 @@ kbd {
   }
 }
 
+.header {
+  position: sticky;
+  top: -1px;
+  z-index: 1;
+  padding-top: 1rem;
+  background-color: var(--color-fill-app)
+}
+
+@media (max-width: 600px), not screen {
+  .header {
+    position: relative;
+    top: 0
+  }
+}
+
+@media (max-height: 1000px), not screen {
+  :root:not(.has-js) .header {
+    position: relative;
+    top: 0
+  }
+}
+
+.header .pinned-header {
+  display: none;
+  margin-right: .4rem;
+  font-weight: 700
+}
+
+.header.is-pinned .header-container {
+  display: none
+}
+
+.header.is-pinned .pinned-header {
+  display: inline
+}
+
+.header.is-pinned #gtoc {
+  margin: 0
+}
+
 .header-container {
   display: flex;
   align-items: center;
-  margin: 1.5rem 0 1rem;
+  margin-bottom: 1rem;
   justify-content: space-between
 }
 
@@ -711,6 +830,33 @@ kbd {
   border: none;
   background: transparent;
   outline: var(--brand3) dotted 2px
+}
+
+@media only screen and (min-width: 601px) {
+  #gtoc > ul > li {
+    display: inline;
+    border-right: 1px solid currentColor;
+    margin-right: .4rem;
+    padding-right: .4rem
+  }
+
+  #gtoc > ul > li:last-child {
+    border-right: none;
+    margin-right: 0;
+    padding-right: 0
+  }
+
+  .header #gtoc > ul > li.pinned-header {
+    display: none
+  }
+
+  .header.is-pinned #gtoc > ul > li.pinned-header {
+    display: inline
+  }
+
+  #gtoc > ul > li.gtoc-picker-header {
+    display: none
+  }
 }
 
 @media only screen and (max-width: 1024px) {
@@ -729,6 +875,10 @@ kbd {
   #column2 {
     display: none
   }
+
+  #gtoc > ul > li.gtoc-picker-header {
+    display: inline
+  }
 }
 
 .icon {
@@ -740,10 +890,15 @@ kbd {
 }
 
 .light-icon {
-  fill: var(--white)
+  fill: var(--white);
+  display: none
 }
 
-.dark-mode .dark-icon, .light-icon {
+.dark-mode {
+  color-scheme: dark
+}
+
+.dark-mode .dark-icon {
   display: none
 }
 
@@ -753,9 +908,10 @@ kbd {
 }
 
 .js-flavor-selector {
+  -webkit-appearance: none;
   appearance: none;
   float: right;
-  background-image: url(data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20width=%222719%22%20height=%22384%22%3E%3Cpath%20d=%22M1191.326%20384h192c106%200%20192-86%20192-192s-86-192-192-192h-192c-106%200-192%2086-192%20192s86%20192%20192%20192zm0-320c70.8%200%20128%2057.3%20128%20128%200%2070.8-57.3%20128-128%20128-70.8%200-128-57.3-128-128%200-70.8%2057.3-128%20128-128z%22/%3E%3Ctext%20stroke-width=%2242%22%20font-family=%22sans-serif%22%20font-weight=%22lighter%22%20font-size=%22490%22%20y=%22370%22%3ECJS%3C/text%3E%3Ctext%20stroke-width=%2242%22%20font-weight=%22lighter%22%20font-family=%22sans-serif%22%20font-size=%22490%22%20y=%22370%22%20x=%221682%22%3EESM%3C/text%3E%3C/svg%3E);
+  background-image: url("data:image/svg+xml,%3c!-- * Font Awesome Free 5.15.2 by @fontawesome - https://fontawesome.com * License - https://fontawesome.com/license/free - CC BY 4.0 --%3e %3csvg xmlns='http://www.w3.org/2000/svg' width='2719' height='384'%3e%3cpath d='M1191.326 384h192c106 0 192-86 192-192s-86-192-192-192h-192c-106 0-192 86-192 192s86 192 192 192zm0-320c70.8 0 128 57.3 128 128 0 70.8-57.3 128-128 128-70.8 0-128-57.3-128-128 0-70.8 57.3-128 128-128z'/%3e%3ctext stroke-width='42' font-family='sans-serif' font-weight='lighter' font-size='490' y='370'%3eCJS%3c/text%3e%3ctext stroke-width='42' font-weight='lighter' font-family='sans-serif' font-size='490' y='370' x='1682'%3eESM%3c/text%3e%3c/svg%3e");
   background-size: contain;
   background-repeat: no-repeat;
   width: 142px;
@@ -763,7 +919,7 @@ kbd {
 }
 
 .js-flavor-selector:checked {
-  background-image: url(data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20height=%22384%22%20width=%222719%22%3E%3Cdefs%3E%3Cpath%20d=%22M-136.321-230.336h2994.365v653.401H-136.321z%22/%3E%3C/defs%3E%3Cpath%20d=%22M1383.326%200h-192c-106%200-192%2086-192%20192s86%20192%20192%20192h192c106%200%20192-86%20192-192s-86-192-192-192zm0%20320c-70.8%200-128-57.3-128-128%200-70.8%2057.3-128%20128-128%2070.8%200%20128%2057.3%20128%20128%200%2070.8-57.3%20128-128%20128z%22/%3E%3Ctext%20stroke-width=%2242%22%20font-family=%22sans-serif%22%20font-weight=%22lighter%22%20font-size=%22490%22%20y=%22370%22%3ECJS%3C/text%3E%3Ctext%20stroke-width=%2242%22%20font-weight=%22lighter%22%20font-family=%22sans-serif%22%20font-size=%22490%22%20y=%22370%22%20x=%221682%22%3EESM%3C/text%3E%3C/svg%3E);
+  background-image: url("data:image/svg+xml,%3c!-- * Font Awesome Free 5.15.2 by @fontawesome - https://fontawesome.com * License - https://fontawesome.com/license/free - CC BY 4.0 --%3e %3csvg xmlns='http://www.w3.org/2000/svg' height='384' width='2719'%3e%3cdefs%3e%3cpath d='M-136.321-230.336h2994.365v653.401H-136.321z'/%3e%3c/defs%3e%3cpath d='M1383.326 0h-192c-106 0-192 86-192 192s86 192 192 192h192c106 0 192-86 192-192s-86-192-192-192zm0 320c-70.8 0-128-57.3-128-128 0-70.8 57.3-128 128-128 70.8 0 128 57.3 128 128 0 70.8-57.3 128-128 128z'/%3e%3ctext stroke-width='42' font-family='sans-serif' font-weight='lighter' font-size='490' y='370'%3eCJS%3c/text%3e%3ctext stroke-width='42' font-weight='lighter' font-family='sans-serif' font-size='490' y='370' x='1682'%3eESM%3c/text%3e%3c/svg%3e")
 }
 
 .js-flavor-selector:checked ~ .cjs, .js-flavor-selector:not(:checked) ~ .mjs {
@@ -778,7 +934,7 @@ kbd {
   .js-flavor-selector {
     height: 1.5em;
     width: auto;
-    aspect-ratio: 7.08072917
+    aspect-ratio: 2719/384
   }
 }
 
@@ -910,8 +1066,37 @@ body {
   font-family: Microsoft Yahei, Lato, Lucida Grande, Lucida Sans Unicode, Lucida Sans, Verdana, Tahoma, sans-serif !important
 }
 
+#scroll_top {
+  padding: 5px 10px;
+  text-align: center;
+  border-top-left-radius: 5px;
+  font-size: 12px;
+  background-color: #333;
+  color: #ccc;
+  opacity: .8;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  cursor: pointer
+}
+
 .sh_comment {
   font-weight: 400 !important
+}
+
+#adWrap a {
+  display: inline-block;
+  padding: 0
+}
+
+#adWrap a:hover {
+  text-decoration: none
+}
+
+#adWrap a img {
+  width: 675px;
+  height: 75px;
+  display: block
 }
 
 #page_api .api_nav_cn_name {
