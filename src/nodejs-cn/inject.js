@@ -1,39 +1,177 @@
 'use strict';
-/* global document window */
+/* global document window IntersectionObserver */
 /* eslint-disable no-useless-escape */
 
-/* dark mode */
+'use strict';
+
+// https://github.com/nodejs/node/blob/v18.4.0/doc/api_assets/api.js
 !function () {
-  var body, btn, mode;
-  body = document.body || document.getElementsByTagName('body')[0];
-  if (!body) {
-    return;
-  }
-  btn = document.getElementById('theme-toggle-btn');
-  if (!btn) {
-    return;
-  }
-  mode = undefined;
-  btn.onclick = function () {
-    if (mode) {
-      body.className = body.className.replace(' dark-mode', '');
-      mode = undefined;
-      if (window.sessionStorage) {
-        window.sessionStorage.removeItem('customDarkTheme');
+  function setupTheme() {
+    var kCustomPreference, userSettings, themeToggleButton, mq;
+    kCustomPreference = 'customDarkTheme';
+    userSettings = window.sessionStorage.getItem(kCustomPreference);
+    themeToggleButton = document.getElementById('theme-toggle-btn');
+
+    function mqChangeListener(e) {
+      document.documentElement.classList.toggle('dark-mode', e.matches);
+    }
+    if (userSettings === null && window.matchMedia) {
+      mq = window.matchMedia('(prefers-color-scheme: dark)');
+
+      if ('onchange' in mq) {
+        mq.addEventListener('change', mqChangeListener);
+        if (themeToggleButton) {
+          themeToggleButton.addEventListener(
+            'click',
+            function() {
+              mq.removeEventListener('change', mqChangeListener);
+            },
+            { once: true }
+          );
+        }
       }
-    } else {
-      body.className += ' dark-mode';
-      mode = '1';
-      if (window.sessionStorage) {
-        window.sessionStorage.setItem('customDarkTheme', mode);
+
+      if (mq.matches) {
+        document.documentElement.classList.add('dark-mode');
+      }
+    } else if (userSettings === 'true') {
+      document.documentElement.classList.add('dark-mode');
+    }
+
+    if (themeToggleButton) {
+      themeToggleButton.hidden = false;
+      themeToggleButton.addEventListener('click', function() {
+        window.sessionStorage.setItem(
+          kCustomPreference,
+          document.documentElement.classList.toggle('dark-mode')
+        );
+      });
+    }
+  }
+
+  function setupPickers() {
+    function closeAllPickers() {
+      var i, picker;
+      for (i = 0; i < pickers.length; i++) {
+        picker = pickers[i];
+        picker.parentNode.classList.remove('expanded');
+      }
+
+      window.removeEventListener('click', closeAllPickers);
+      window.removeEventListener('keydown', onKeyDown);
+    }
+
+    function onKeyDown(e) {
+      if (e.key === 'Escape') {
+        closeAllPickers();
       }
     }
-  };
-  if (window.sessionStorage &&
-    window.sessionStorage.getItem('customDarkTheme')) {
-    btn.click();
+
+    var i, picker,
+      pickers = document.querySelectorAll('.picker-header > a');
+
+    for (i = 0; i < pickers.length; i++) {
+      picker = pickers[i];
+      const parentNode = picker.parentNode;
+
+      picker.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        /*
+          closeAllPickers as window event trigger already closed all the pickers,
+          if it already closed there is nothing else to do here
+        */
+        if (parentNode.classList.contains('expanded')) {
+          return;
+        }
+
+        /*
+          In the next frame reopen the picker if needed and also setup events
+          to close pickers if needed.
+        */
+
+        (window.requestAnimationFrame || setTimeout)(function() {
+          parentNode.classList.add('expanded');
+          window.addEventListener('click', closeAllPickers);
+          window.addEventListener('keydown', onKeyDown);
+        });
+      });
+    }
   }
-  btn.removeAttribute('hidden');
+
+  function setupStickyHeaders() {
+    if (typeof IntersectionObserver === 'undefined') {
+      return;
+    }
+    var header = document.querySelector('.header'),
+      ignoreNextIntersection = false;
+
+    new IntersectionObserver(
+      function(e) {
+        const currentStatus = header.classList.contains('is-pinned');
+        const newStatus = e[0].intersectionRatio < 1;
+
+        // Same status, do nothing
+        if (currentStatus === newStatus) {
+          return;
+        } else if (ignoreNextIntersection) {
+          ignoreNextIntersection = false;
+          return;
+        }
+
+        /*
+          To avoid flickering, ignore the next changes event that is triggered
+          as the visible elements in the header change once we pin it.
+          The timer is reset anyway after few milliseconds.
+        */
+        ignoreNextIntersection = true;
+        setTimeout(function() {
+          ignoreNextIntersection = false;
+        }, 50);
+
+        header.classList.toggle('is-pinned', newStatus);
+      },
+      { threshold: [1] }
+    ).observe(header);
+  }
+
+  function setupAltDocsLink() {
+    var linkWrapper = document.getElementById('alt-docs');
+
+    function updateHashes() {
+      var list = linkWrapper.querySelectorAll('a'), link, i;
+      for (i = 0; i < list.length; i++) {
+        link = list[i];
+        link.hash = window.location.hash;
+      }
+    }
+
+    window.addEventListener('hashchange', updateHashes);
+    updateHashes();
+  }
+
+  function bootstrap() {
+    // Check if we have JavaScript support.
+    document.documentElement.classList.add('has-js');
+
+    // Restore user mode preferences.
+    setupTheme();
+
+    // Handle pickers with click/taps rather than hovers.
+    setupPickers();
+
+    // Track when the header is in sticky position.
+    setupStickyHeaders();
+
+    // Make link to other versions of the doc open to the same hash target (if it exists).
+    setupAltDocsLink();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootstrap, { once: true });
+  } else {
+    bootstrap();
+  }
 }();
 
 !function () {
