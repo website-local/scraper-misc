@@ -189,18 +189,20 @@ const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   }).remove();
 
   // decrypt the stuffs behind login wall
-  await decryptContent($, res.url, options);
+  await decryptContent($, (res.uri ?? URI(res.url)).clone().hash('').toString(), options);
 
   $('#biz_nav').remove();
   $('#biz_content').remove();
   $('#biz_item').remove();
   // login stuff
   $('#btn_login,#btn_logout,#wxcode_box').remove();
+  $('#wxpaycode_box').remove();
   // remove all scripts
   $('script').remove();
   $('a[href="/"]').remove();
-  $('a[href="/search"],a[href="http://api.nodejs.cn/"]')
-    .addClass('link-to-search');
+  $('a[href="/search"]').addClass('link-to-search');
+  $('a[href="http://api.nodejs.cn/"]').addClass('link-to-search');
+  $('a[href^="http://api.nodejs.cn/"]').addClass('link-to-search');
   $('a[href^="/run/"]').addClass('link-to-run');
   // style sheet, not needed since we re-implemented it
   $('link[rel="stylesheet"]').remove();
@@ -260,6 +262,10 @@ const postProcessSavePath = (
     const expectedPrefix = join(HOST, api);
     if (res.savePath.startsWith(expectedPrefix)) {
       res.savePath = res.savePath.replace(expectedPrefix, join(HOST, 'api'));
+    }
+    if (res.redirectedSavePath &&
+      res.redirectedSavePath.startsWith(expectedPrefix)) {
+      res.redirectedSavePath = res.redirectedSavePath.replace(expectedPrefix, join(HOST, 'api'));
     }
   }
   return res;
