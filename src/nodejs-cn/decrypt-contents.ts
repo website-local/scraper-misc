@@ -8,7 +8,7 @@ import type {CheerioStatic} from 'website-scrap-engine/lib/types';
 // the original decrypt and restore function
 // function fn({docs, data, decrypt, enc, loadingDoms}) {
 //   docs.push(...(data.split('-a0a-').map(doc => {
-//     return decrypt(doc, 'qQ1').toString(enc.Utf8);
+//     return decrypt(doc, '0aa20b25-fb94-4900-9a35-be1c8f37cec4').toString(enc.Utf8);
 //   })));
 //   let index = 0;
 //   for (let loadingDom of loadingDoms) {
@@ -16,10 +16,10 @@ import type {CheerioStatic} from 'website-scrap-engine/lib/types';
 //     index++;
 //   }
 // }
-
 const separator = '-a0a-';
 // the real key is computed inside crypto-js using some kdf
-const key = 'qQ1';
+// '0aa20b25-fb94-4900-9a35-be1c8f37cec4'
+const key = '0aa20b25-fb94-4900-9a35-be1c8f37cec4';
 
 const decryptOne = (input: string): string =>
   AES.decrypt(input, key).toString(Utf8);
