@@ -1,6 +1,8 @@
 import got from 'got';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 import {error as errorLogger} from 'website-scrap-engine/lib/logger/logger';
+import AES from 'crypto-js/aes';
+import Utf8 from 'crypto-js/enc-utf8';
 
 const KW_ARR_BEGIN = 'var arr = [',
   KW_ARR_END = '];',
@@ -13,6 +15,9 @@ const HOST = 'nodejs.cn',
 const LOCATION_REPLACE_LITERAL = 'location.replace(\'',
   LOCATION_REPLACE_LITERAL_END = '\')';
 
+const WINDOW_LINK_START = 'window.LINK = \'',
+  WINDOW_LINK_END = '\';';
+const WINDOW_LINK_DECRYPT_KEY = '70ffab5e-7998-41c5-b94c-6ad639b905ab';
 
 const gotNoRedirect = got.extend({
   followRedirect: false
@@ -66,7 +71,21 @@ const getRedirectLocation = async (
         link = html.slice(
           literalBegin + LOCATION_REPLACE_LITERAL.length, literalEnd);
       } else {
-        errorLogger.warn('Unknown redirect result format', link, html);
+        // the new redirect page since 20220802
+        const windowLinkBegin = html.indexOf(WINDOW_LINK_START),
+          windowLinkEnd = windowLinkBegin > 0 ?
+            html.indexOf(WINDOW_LINK_END, literalBegin) : -1;
+        if (windowLinkBegin > 0 && windowLinkEnd > 0) {
+          const encrypted = html.slice(
+            windowLinkBegin + WINDOW_LINK_START.length, windowLinkEnd);
+          try {
+            link = AES.decrypt(encrypted, WINDOW_LINK_DECRYPT_KEY).toString(Utf8);
+          } catch (e) {
+            errorLogger.warn('Error decrypting link', link, html);
+          }
+        } else {
+          errorLogger.warn('Unknown redirect result format', link, html);
+        }
       }
     }
   }
@@ -135,14 +154,18 @@ const hardCodedRedirectFullPathBuilder = (api: string): Record<string, string> =
 
 export const hardCodedRedirect: Record<string, string> = {
   ...hardCodedRedirectBuilder('api'),
+  ...hardCodedRedirectBuilder('api-v18'),
   ...hardCodedRedirectBuilder('api-v16'),
   ...hardCodedRedirectBuilder('api-v14'),
+  ...hardCodedRedirectBuilder('api-v12'),
 };
 
 export const hardCodedRedirectFullPath: Record<string, string> = {
   ...hardCodedRedirectFullPathBuilder('api'),
+  ...hardCodedRedirectFullPathBuilder('api-v18'),
   ...hardCodedRedirectFullPathBuilder('api-v16'),
   ...hardCodedRedirectFullPathBuilder('api-v14'),
+  ...hardCodedRedirectFullPathBuilder('api-v12'),
 };
 
 export const initNodeApiPath = (api: string): void => {
