@@ -1,0 +1,19 @@
+// the original decrypt and restore function
+
+// npm login
+// (()=>{if(!_hr.includes('nodejs.cn/'+DOC_ID)) return; const d=JSON.parse(_C.AES.decrypt(_t, _U.parse('0aa20b88-fb94-4900-9a35-be2c8f378703'),{ iv:_U.parse('1001024'), }).toString(_U)); if(!d.vipTime){throw 'e'} })()
+
+// npm decrypt
+// (()=>{if(!_hr.includes('nodejs.cn/'+DOC_ID)) return; _cr.forEach((d)=>{ d.innerHTML=_C.AES.decrypt(d.innerHTML,_U.parse('0aa20b25-fb94-4900-9a35-be2c8f378703'),{ iv:_U.parse(ITEM_ID.length+ITEM_NAME.length), }).toString(_U) }) })()
+
+// npm link
+// (()=>{if(!_hr.includes('nodejs.cn/'+DOC_ID))return; _t.setAttribute('href',_C.AES.decrypt(_t2,_U.parse('0aa20b25-fb94-4900-9a35-be2c8f37bec4'),{ iv:_U.parse(ITEM_ID.length+ITEM_NAME.length), }).toString(_U)); })()
+
+// node login
+// function fn(   token, decrypt, enc ) {   const d = JSON.parse(decrypt(token, enc.Utf8.parse('0aa20b88-fb94-4900-9a35-be2c8f378703'), {     iv: enc.Utf8.parse('1001024'),   }).toString(enc.Utf8));   if (!d.vipTime || _D - _FT(d.loginTime) > 86400000) { throw 'e' } }
+
+// node decrypt
+// function fn(   docs, data, decrypt, enc, loadingDoms ) {   docs.push(...(data.split('-a0a-').map(doc => {     return decrypt(doc, '0aa20b25-fb94-4900-9a35-be1c8f37cec4').toString(enc.Utf8);   })));   let index = 0;   for (let loadingDom of loadingDoms) {     loadingDom.innerHTML = docs[index];     index++;   } }
+
+// node link
+// function fn(   AES, enc ) {   const link = AES.decrypt(window.LINK, '70ffab5e-7998-41c5-b94c-6ad639b905ab').toString(enc.Utf8);   location.href = link; }

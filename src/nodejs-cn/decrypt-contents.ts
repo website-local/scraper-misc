@@ -5,17 +5,6 @@ import {error as errorLogger} from 'website-scrap-engine/lib/logger/logger';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 import type {CheerioStatic} from 'website-scrap-engine/lib/types';
 
-// the original decrypt and restore function
-// function fn({docs, data, decrypt, enc, loadingDoms}) {
-//   docs.push(...(data.split('-a0a-').map(doc => {
-//     return decrypt(doc, '0aa20b25-fb94-4900-9a35-be1c8f37cec4').toString(enc.Utf8);
-//   })));
-//   let index = 0;
-//   for (let loadingDom of loadingDoms) {
-//     loadingDom.innerHTML = docs[index];
-//     index++;
-//   }
-// }
 const separator = '-a0a-';
 // the real key is computed inside crypto-js using some kdf
 // '0aa20b25-fb94-4900-9a35-be1c8f37cec4'
