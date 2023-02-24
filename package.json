@@ -17,7 +17,7 @@
     "website-scrap-engine": "^0.5.0"
   },
   "devDependencies": {
-    "@types/mkdirp": "^1.0.2",
+    "@types/mkdirp": "^2.0.0",
     "@types/node": "^18.14.1",
     "@types/tough-cookie": "^4.0.2",
     "@types/urijs": "^1.19.19",
