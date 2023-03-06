@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@types/crypto-js": "^4.1.1",
-    "agentkeepalive": "^4.2.1",
+    "agentkeepalive": "^4.3.0",
     "crypto-js": "^4.1.1",
     "json5": "^2.2.3",
     "mkdirp": "^2.1.4",
