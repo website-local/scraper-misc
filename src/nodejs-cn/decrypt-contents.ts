@@ -1,7 +1,8 @@
 import AES from 'crypto-js/aes';
 import Utf8 from 'crypto-js/enc-utf8';
 import got from 'got';
-import {error as errorLogger} from 'website-scrap-engine/lib/logger/logger';
+import type {HTTPError} from 'got';
+import {error as errorLogger, notFound} from 'website-scrap-engine/lib/logger/logger';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 import type {CheerioStatic} from 'website-scrap-engine/lib/types';
 
@@ -33,14 +34,23 @@ const fetchAndDecrypt = async (
 
   const theGot = options?.req ? got.extend(options.req) : got;
 
-  const resp = await theGot(realContentUrl);
+  try {
+    const resp = await theGot(realContentUrl);
 
-  const body = resp.body;
-  if (!body?.length) {
-    errorLogger.error('fetchAndDecrypt: empty body', realContentUrl, resp);
-    return;
+    const body = resp.body;
+    if (!body?.length) {
+      errorLogger.error('fetchAndDecrypt: empty body', realContentUrl, resp);
+      return;
+    }
+    return decrypt(body);
+  } catch (e) {
+    if (e && (e as HTTPError).name === 'HTTPError' &&
+      (e as HTTPError).response?.statusCode === 404) {
+      notFound.error(realContentUrl, url);
+      return;
+    }
+    throw e;
   }
-  return decrypt(body);
 };
 
 const asyncCache: Record<string, Promise<string[] | void>> = {};
