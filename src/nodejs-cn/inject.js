@@ -105,6 +105,9 @@
     }
     var header = document.querySelector('.header'),
       ignoreNextIntersection = false;
+    if (!header) {
+      return;
+    }
 
     new IntersectionObserver(
       function(e) {
