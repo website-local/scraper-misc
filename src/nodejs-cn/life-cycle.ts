@@ -50,7 +50,8 @@ const linkRedirectFunc = async (
     return link;
   }
   if (link && (link.startsWith('/s/') ||
-    link.startsWith('http://url.nodejs.cn/'))) {
+    link.startsWith('http://url.nodejs.cn/') ||
+    link.startsWith('https://url.nodejs.cn/'))) {
     // workaround for broken links to source code on github
     // since v14.16.1, 2021-04-22
     if (elem) {
@@ -98,7 +99,7 @@ const linkRedirectFunc = async (
     if (link[0] === '/') {
       link = link.replace(/^\/api\//, `/${api}/`);
     } else {
-      link = link.replace(/^http:\/\/nodejs.cn\/api\//,
+      link = link.replace(/^https?:\/\/nodejs.cn\/api\//,
         `http://nodejs.cn/${api}/`);
     }
   }
@@ -203,6 +204,8 @@ const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   $('a[href="/search"]').addClass('link-to-search');
   $('a[href="http://api.nodejs.cn/"]').addClass('link-to-search');
   $('a[href^="http://api.nodejs.cn/"]').addClass('link-to-search');
+  $('a[href="https://api.nodejs.cn/"]').addClass('link-to-search');
+  $('a[href^="https://api.nodejs.cn/"]').addClass('link-to-search');
   $('a[href^="/run/"]').addClass('link-to-run');
   // style sheet, not needed since we re-implemented it
   $('link[rel="stylesheet"]').remove();

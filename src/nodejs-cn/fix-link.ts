@@ -109,6 +109,14 @@ export const cachedGetRedirectLocation = (
   return asyncRedirectCache[link] = getRedirectLocation(link, options);
 };
 
+const maybeHttps = (map: Record<string, string>): Record<string, string> => {
+  Object.entries(map).forEach(entry => {
+    map[entry[0].replace('http://', 'https://')] =
+      entry[1].replace('http://', 'https://');
+  });
+  return map;
+};
+
 // the 404-not-found links
 const hardCodedRedirectBuilder = (api: string): Record<string, string> => ({
   [`/${api}/stream.md`]: `/${api}/stream.html`,
@@ -132,7 +140,7 @@ const hardCodedRedirectBuilder = (api: string): Record<string, string> => ({
 
 });
 
-const hardCodedRedirectFullPathBuilder = (api: string): Record<string, string> => ({
+const hardCodedRedirectFullPathBuilder = (api: string): Record<string, string> => maybeHttps({
   // 14.9.0
   // http://nodejs.cn/api/module.html
   [`http://${HOST}/${api}/modules_cjs.html#modules_cjs_the_module_wrapper`]:

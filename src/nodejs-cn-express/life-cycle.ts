@@ -12,7 +12,9 @@ import {preProcessHtml} from '../nodejs-cn-npm/process-html';
 
 const skipExternalLink = (res: Resource, element: Cheerio | null) => {
   const url = res.url;
-  if (!url.startsWith('http://nodejs.cn/express/') && element?.is('a')) {
+  if (!url.startsWith('http://nodejs.cn/express/') &&
+    !url.startsWith('https://nodejs.cn/express/') &&
+    element?.is('a')) {
     return;
   }
   return res;
