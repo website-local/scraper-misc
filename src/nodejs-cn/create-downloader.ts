@@ -1,6 +1,6 @@
 import path from 'path';
 import {promises as fs} from 'fs';
-import {sync as mkdir} from 'mkdirp';
+import {mkdirpSync as mkdir} from 'mkdirp';
 import {SingleThreadDownloader} from 'website-scrap-engine/lib/downloader';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 
