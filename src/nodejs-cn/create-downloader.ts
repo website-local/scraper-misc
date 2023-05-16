@@ -4,11 +4,13 @@ import {mkdirpSync as mkdir} from 'mkdirp';
 import {SingleThreadDownloader} from 'website-scrap-engine/lib/downloader';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 
+const defaultApiPath = 'dist/latest-v20.x/docs/api';
+
 export default function createDownloader(
   overrideOptions: Partial<StaticDownloadOptions>
 ): Promise<SingleThreadDownloader> {
-  let api = overrideOptions?.meta?.nodeApiPath as string || 'api';
-  if (api !== 'api') {
+  let api = overrideOptions?.meta?.nodeApiPath as string || defaultApiPath;
+  if (api !== defaultApiPath) {
     overrideOptions.initialUrl = [`http://nodejs.cn/${api}/`];
   }
   const downloader: SingleThreadDownloader =
@@ -16,7 +18,7 @@ export default function createDownloader(
   return downloader.init.then(() => {
     downloader.start();
     if (overrideOptions?.meta?.replaceNodeApiPath) {
-      api = 'api';
+      api = defaultApiPath;
     }
     const staticPath: string = path.join(downloader.options.localRoot,
       'nodejs.cn', api, 'static');

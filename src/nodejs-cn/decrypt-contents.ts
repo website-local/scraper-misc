@@ -97,3 +97,55 @@ export async function decryptContent(
     }
   }
 }
+const NI_REGEX = /^\s*window\._ni\s*=\s*["']([^'"]+)["']\s*;?\s*$/;
+
+export function decryptLinks($: CheerioStatic, url: string): void {
+  let ni = '';
+  $('script').each((i, el) => {
+    if (ni) {
+      return;
+    }
+    const e = $(el);
+    if (e.attr('src')) {
+      return;
+    }
+    const html = e.html();
+    if (!html) {
+      return;
+    }
+    const exec = NI_REGEX.exec(html);
+    if (!exec) {
+      return;
+    }
+    if (exec[1]) {
+      ni = exec[1];
+    }
+  });
+  if (!ni) {
+    errorLogger.info('decryptLinks: ni not found', url);
+    return;
+  }
+  $('#apicontent a').each((i, el) => {
+    const e = $(el);
+    const encrypted = e.attr('data-href');
+    if (!encrypted) {
+      return;
+    }
+    // const _c=CryptoJS; _hr=location.href; _cu=_c.enc.Utf8; _cp=_cu.parse; _cd=_c.AES.decrypt;
+    // _t=_ele; _t2=_t.getAttribute('data-href');
+    // _cd(_t2,_cp('0aa20b25fb941900-nodejs-node'), {iv:_cp(_ni.length*123), }).toString(_cu);
+    try {
+      const decrypted = AES.decrypt(
+        encrypted, Utf8.parse('0aa20b25fb941900-nodejs-node'), {
+          iv: Utf8.parse(String(ni.length * 123))
+        }).toString(Utf8);
+      if (decrypted) {
+        e.attr('href', decrypted);
+        e.removeAttr('data-href');
+        e.removeAttr('target');
+      }
+    } catch (e) {
+      errorLogger.debug('error decrypting link', encrypted, e);
+    }
+  });
+}

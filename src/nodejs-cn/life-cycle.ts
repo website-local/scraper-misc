@@ -27,7 +27,7 @@ import type {
   PipelineExecutor
 } from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
 import type {DownloaderWithMeta} from 'website-scrap-engine/lib/downloader/types';
-import {decryptContent} from './decrypt-contents';
+import {decryptContent, decryptLinks} from './decrypt-contents';
 import {
   cache,
   cachedGetRedirectLocation,
@@ -37,8 +37,10 @@ import {
 } from './fix-link';
 
 const HOST = 'nodejs.cn',
-  PROTOCOL = 'http',
+  PROTOCOL = 'https',
   URL_PREFIX = `${PROTOCOL}://${HOST}`;
+
+const defaultApiPath = 'dist/latest-v20.x/docs/api';
 
 const linkRedirectFunc = async (
   link: string,
@@ -93,14 +95,14 @@ const linkRedirectFunc = async (
   if (redirectLink) {
     link = redirectLink;
   }
-  let api = 'api';
+  let api = defaultApiPath;
   if (options?.meta?.nodeApiPath) {
     api = options.meta.nodeApiPath as string;
     if (link[0] === '/') {
       link = link.replace(/^\/api\//, `/${api}/`);
     } else {
       link = link.replace(/^https?:\/\/nodejs.cn\/api\//,
-        `http://nodejs.cn/${api}/`);
+        `https://nodejs.cn/${api}/`);
     }
   }
   let u = URI(link);
@@ -127,21 +129,12 @@ const dropResource: ProcessResourceBeforeDownloadFunc = (
   parent,
   options
 ): Resource => {
-  let shouldDrop: boolean;
-  const api = options?.meta?.nodeApiPath;
-  if (api) {
-    shouldDrop = !(res.uri?.host() === HOST &&
-        res.uri.path().startsWith(`/${api}`)) ||
-      res.uri.path() === `/${api}/static/inject.css` ||
-      res.uri.path() === `/${api}/static/favicon.png` ||
-      res.uri.path() === `/${api}/static/inject.js`;
-  } else {
-    shouldDrop = !(res.uri?.host() === HOST &&
-        res.uri.path().startsWith('/api')) ||
-      res.uri.path() === '/api/static/inject.css' ||
-      res.uri.path() === '/api/static/favicon.png' ||
-      res.uri.path() === '/api/static/inject.js';
-  }
+  const api = options?.meta?.nodeApiPath || defaultApiPath;
+  const shouldDrop = !(res.uri?.host() === HOST &&
+      res.uri.path().startsWith(`/${api}`)) ||
+    res.uri.path() === `/${api}/static/inject.css` ||
+    res.uri.path() === `/${api}/static/favicon.png` ||
+    res.uri.path() === `/${api}/static/inject.js`;
   if (shouldDrop) {
     res.shouldBeDiscardedFromDownload = true;
   }
@@ -183,14 +176,17 @@ const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
     res.meta.doc = parseHtml(res, options);
   }
   const $ = res.meta.doc;
-  const head = $('head'), body = $('body');
+  const head = $('head'),
+    body = $('body');
   // remove comments in body
   body.contents().filter(function (this) {
     return this.nodeType === 8;
   }).remove();
 
+  const url = (res.uri ?? URI(res.url)).clone().hash('').toString();
   // decrypt the stuffs behind login wall
-  await decryptContent($, (res.uri ?? URI(res.url)).clone().hash('').toString(), options);
+  await decryptContent($, url, options);
+  decryptLinks($, url);
 
   $('#biz_nav').remove();
   $('#biz_content').remove();
@@ -200,7 +196,9 @@ const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   $('#wxpaycode_box').remove();
   // remove all scripts
   $('script').remove();
+  $('.wwads-cn,.wwads-horizontal').remove();
   $('a[href="/"]').remove();
+  $('a[href*="aliyun.com"]').remove();
   $('a[href="/search"]').addClass('link-to-search');
   $('a[href="http://api.nodejs.cn/"]').addClass('link-to-search');
   $('a[href^="http://api.nodejs.cn/"]').addClass('link-to-search');
@@ -209,7 +207,7 @@ const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   $('a[href^="/run/"]').addClass('link-to-run');
   // style sheet, not needed since we re-implemented it
   $('link[rel="stylesheet"]').remove();
-  const api = options?.meta?.nodeApiPath as string | void || 'api';
+  const api = options?.meta?.nodeApiPath as string | void || defaultApiPath;
   // style for page and prism.js
   // language=HTML
   $(`
@@ -227,7 +225,7 @@ const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   $('<link rel="icon" sizes="32x32" type="image/png" ' +
     `href="${URL_PREFIX}/${api}/static/favicon.png">`).appendTo(head);
 
-  if (api && api !== 'api' && options?.meta?.replaceNodeApiPath) {
+  if (api && api !== defaultApiPath && options?.meta?.replaceNodeApiPath) {
     const el = $('#alt-docs').parent().parent();
     if (el.is('li.picker-header')) {
       el.remove();
@@ -264,11 +262,12 @@ const postProcessSavePath = (
   if (api && typeof api === 'string' && options?.meta?.replaceNodeApiPath) {
     const expectedPrefix = join(HOST, api);
     if (res.savePath.startsWith(expectedPrefix)) {
-      res.savePath = res.savePath.replace(expectedPrefix, join(HOST, 'api'));
+      res.savePath = res.savePath.replace(expectedPrefix, join(HOST, defaultApiPath));
     }
     if (res.redirectedSavePath &&
       res.redirectedSavePath.startsWith(expectedPrefix)) {
-      res.redirectedSavePath = res.redirectedSavePath.replace(expectedPrefix, join(HOST, 'api'));
+      res.redirectedSavePath = res.redirectedSavePath.replace(
+        expectedPrefix, join(HOST, defaultApiPath));
     }
   }
   return res;
@@ -297,9 +296,9 @@ lifeCycle.processAfterDownload.push(
 
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
 options.logSubDir = HOST;
-options.maxDepth = 4;
+options.maxDepth = 5;
 options.concurrency = 12;
-options.initialUrl = [URL_PREFIX + '/api/'];
+options.initialUrl = [URL_PREFIX + '/' + defaultApiPath + '/'];
 options.req.headers = {
   'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
     '(KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'

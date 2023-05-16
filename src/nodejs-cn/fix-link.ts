@@ -92,7 +92,9 @@ const getRedirectLocation = async (
   // replace the api to required version
   if (options?.meta?.nodeApiPath) {
     link = link.replace(`${URL_PREFIX}/api/`,
-      `${URL_PREFIX}/${options.meta.nodeApiPath}/`);
+      `${URL_PREFIX}/${options.meta.nodeApiPath}/`)
+      .replace(`${URL_PREFIX}/dist/latest-v20.x/`,
+        `${URL_PREFIX}/${options.meta.nodeApiPath}/`);
   }
   return link;
 };
@@ -161,6 +163,9 @@ const hardCodedRedirectFullPathBuilder = (api: string): Record<string, string> =
 });
 
 export const hardCodedRedirect: Record<string, string> = {
+  ...hardCodedRedirectBuilder('dist/latest-v20.x'),
+  ...hardCodedRedirectBuilder('dist/latest-v18.x'),
+  ...hardCodedRedirectBuilder('dist/latest-v16.x'),
   ...hardCodedRedirectBuilder('api'),
   ...hardCodedRedirectBuilder('api-v18'),
   ...hardCodedRedirectBuilder('api-v16'),
@@ -169,6 +174,9 @@ export const hardCodedRedirect: Record<string, string> = {
 };
 
 export const hardCodedRedirectFullPath: Record<string, string> = {
+  ...hardCodedRedirectFullPathBuilder('dist/latest-v20.x'),
+  ...hardCodedRedirectFullPathBuilder('dist/latest-v18.x'),
+  ...hardCodedRedirectFullPathBuilder('dist/latest-v16.x'),
   ...hardCodedRedirectFullPathBuilder('api'),
   ...hardCodedRedirectFullPathBuilder('api-v18'),
   ...hardCodedRedirectFullPathBuilder('api-v16'),
