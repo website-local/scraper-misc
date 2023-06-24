@@ -216,6 +216,7 @@ const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   $('a[href^="/run/"]').addClass('link-to-run');
   // style sheet, not needed since we re-implemented it
   $('link[rel="stylesheet"]').remove();
+  $('link[rel="canonical"]').remove();
   const api = options?.meta?.nodeApiPath as string | void || defaultApiPath;
   // style for page and prism.js
   // language=HTML
