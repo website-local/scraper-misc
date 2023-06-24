@@ -1,6 +1,6 @@
 {
   "name": "scraper-misc",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "scraper of websites which do not need a lot of transformation",
   "main": "index.js",
   "engines": {
