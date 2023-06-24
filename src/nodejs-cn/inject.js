@@ -1,5 +1,5 @@
 'use strict';
-/* global document window IntersectionObserver */
+/* global document window IntersectionObserver navigator */
 /* eslint-disable no-useless-escape */
 
 'use strict';
@@ -153,6 +153,67 @@
     updateHashes();
   }
 
+  // https://stackoverflow.com/a/30810322
+  function fallbackCopyTextToClipboard(text) {
+    var textArea = document.createElement('textarea');
+    textArea.value = text;
+
+    // Avoid scrolling to bottom
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.position = 'fixed';
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      var successful = document.execCommand('copy');
+      var msg = successful ? 'successful' : 'unsuccessful';
+      console.log('Fallback: Copying text command was ' + msg);
+    } catch (err) {
+      console.error('Fallback: Oops, unable to copy', err);
+    }
+
+    document.body.removeChild(textArea);
+  }
+
+  function setupCopyButton() {
+    const buttons = document.querySelectorAll('.copy-button');
+    buttons.forEach((button) => {
+      button.addEventListener('click', (el) => {
+        const parentNode = el.target.parentNode;
+
+        const flavorSelector = parentNode.querySelector('.js-flavor-selector');
+
+        let code = '';
+
+        if (flavorSelector) {
+          if (flavorSelector.checked) {
+            code = parentNode.querySelector('.mjs').textContent;
+          } else {
+            code = parentNode.querySelector('.cjs').textContent;
+          }
+        } else {
+          code = parentNode.querySelector('code').textContent;
+        }
+
+        button.textContent = '已拷贝';
+
+        setTimeout(() => {
+          button.textContent = '拷贝';
+        }, 2500);
+
+        if (!navigator.clipboard) {
+          fallbackCopyTextToClipboard(code);
+          return;
+        }
+        navigator.clipboard.writeText(code);
+
+      });
+    });
+  }
+
   function bootstrap() {
     // Check if we have JavaScript support.
     document.documentElement.classList.add('has-js');
@@ -168,6 +229,8 @@
 
     // Make link to other versions of the doc open to the same hash target (if it exists).
     setupAltDocsLink();
+
+    setupCopyButton();
   }
 
   if (document.readyState === 'loading') {
