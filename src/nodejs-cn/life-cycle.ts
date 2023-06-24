@@ -109,6 +109,15 @@ const linkRedirectFunc = async (
   if (u.is('relative')) {
     u = u.absoluteTo(parent.url).normalizePath();
   }
+  if (u.path() === '/dist/latest-v17.x/docs/api/worker_threads.html') {
+    u.path(`/${api}/worker_threads.html`);
+    link = u.toString();
+  }
+  // wtf is this
+  if (u.path().endsWith('/esm.md')) {
+    u.path(u.path().replace('/esm.md', '/esm.html'));
+    link = u.toString();
+  }
   const pathArr = u.path().split('/');
   if (pathArr.length === 3 && pathArr[1] === api && pathArr[2].endsWith('.md')) {
     pathArr[2] = pathArr[2].replace(/\.md$/i, '.html');
@@ -131,7 +140,7 @@ const dropResource: ProcessResourceBeforeDownloadFunc = (
 ): Resource => {
   const api = options?.meta?.nodeApiPath || defaultApiPath;
   const shouldDrop = !(res.uri?.host() === HOST &&
-      res.uri.path().startsWith(`/${api}`)) ||
+      res.uri.path().startsWith('/dist/latest-v')) ||
     res.uri.path() === `/${api}/static/inject.css` ||
     res.uri.path() === `/${api}/static/favicon.png` ||
     res.uri.path() === `/${api}/static/inject.js`;
