@@ -45,8 +45,25 @@ function skipExternalLink(
   return res;
 }
 
+function fixBadNpmLink(url: string): string {
+  if (!url) {
+    return url;
+  }
+  const prefixArr = [
+    ['https://docs.npmjs.com', 'https://docs.npmjs.com/'],
+  ];
+  for (const prefix of prefixArr) {
+    if (url.startsWith(prefix[0]) && !url.startsWith(prefix[1])) {
+      url = url.replace(prefix[0], prefix[1]);
+      break;
+    }
+  }
+  return url;
+}
+
 const lifeCycle: ProcessingLifeCycle = defaultLifeCycle();
 lifeCycle.init.push(init);
+lifeCycle.linkRedirect.push(fixBadNpmLink);
 lifeCycle.processBeforeDownload.push(skipExternalLink);
 lifeCycle.processAfterDownload.unshift(preProcessHtml);
 lifeCycle.processAfterDownload.push((res) => {
