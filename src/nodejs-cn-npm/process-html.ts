@@ -111,7 +111,10 @@ export const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   $('#biz_content').remove();
   $('#biz_item').remove();
   $('#wxcode_box').remove();
+  $('.wwads-cn').remove();
   $('.footer-links').remove();
+  $('#pagead').remove();
+  $('script[src^="https://cdn.wwads.cn/"]').remove();
 
   return res;
 };
