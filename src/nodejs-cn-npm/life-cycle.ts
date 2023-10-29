@@ -1,4 +1,4 @@
-import {Resource} from 'website-scrap-engine/lib/resource';
+import {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
 import type {
   ProcessingLifeCycle
 } from 'website-scrap-engine/lib/life-cycle/types';
@@ -49,6 +49,19 @@ const lifeCycle: ProcessingLifeCycle = defaultLifeCycle();
 lifeCycle.init.push(init);
 lifeCycle.processBeforeDownload.push(skipExternalLink);
 lifeCycle.processAfterDownload.unshift(preProcessHtml);
+lifeCycle.processAfterDownload.push((res) => {
+  if (res.type !== ResourceType.Html) {
+    return res;
+  }
+  if (!res.meta.doc) {
+    return res;
+  }
+  const $ = res.meta.doc;
+  // remove all scripts
+  $('script').remove();
+  return res;
+});
+
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
 options.maxDepth = 4;
 options.concurrency = 12;
