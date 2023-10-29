@@ -6,37 +6,12 @@ import {
 import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {parseHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
-import {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
-import {NpmPageScriptData, parseScriptContent} from './parse-script';
+import {CheerioStatic} from 'website-scrap-engine/lib/types';
 import AES from 'crypto-js/aes';
 import Utf8 from 'crypto-js/enc-utf8';
 
-const decryptKey = '0aa20b25-fb94-4900-9a35-be2c8f378703';
-
-function parseScriptData($: CheerioStatic): {
-  scriptData: NpmPageScriptData | void,
-  scripts: Cheerio
-} {
-  let scriptData: NpmPageScriptData | void;
-  const scripts = $('script');
-  for (let i = 0; i < scripts.length; i++) {
-    const el = $(scripts[i]);
-    const src = el.attr('src');
-    if (src) {
-      continue;
-    }
-    const html = el.html();
-    if (html) {
-      scriptData = parseScriptContent(html);
-      if (scriptData) {
-        break;
-      }
-    }
-  }
-  return {scriptData, scripts};
-}
-
 function fixHeadings($: CheerioStatic) {
+  // TODO: this might be useless now
   const headings = $('#content')
     .find('h1,h2,h3,h4,h5,h6');
   for (let i = 0; i < headings.length; i++) {
@@ -60,39 +35,35 @@ ${html}`;
   }
 }
 
-function decryptContents(scriptData: NpmPageScriptData | void, $: CheerioStatic) {
-  if (scriptData?.itemId && scriptData?.itemName) {
-    const encrypted = $('.cr');
-    const iv = String(scriptData.itemId.length + scriptData.itemName.length);
-    for (let i = 0; i < encrypted.length; i++) {
-      const el = $(encrypted[i]);
-      const html = el.html();
-      if (!html) {
-        continue;
-      }
-      const decrypted = AES.decrypt(html, Utf8.parse(decryptKey), {
-        iv: Utf8.parse(iv),
-      }).toString(Utf8);
-      el.html(decrypted);
-      el.removeClass('cr');
-    }
-  }
-}
+/*
+// original decrypt code
+_np:
+const _c=CryptoJS; _hr=location.href; _cu=_c.enc.Utf8; _cp=_cu.parse; _cd=_c.AES.decrypt;
+_nh:
+_t=_ele; _t2=_t.getAttribute('data-href');
+_nd:
+(()=>{if(!_hr.includes('nodejs.cn'))return; _t.setAttribute('href',
+_cd(_t2,_cp('0ast0t25-fb94-4900-9a35-be2c8f37bec4'), {iv:_cp(_ni.length*123), }).toString(_cu)); })()
+ */
+function decryptLinks($: CheerioStatic) {
 
-function decryptLinks(scriptData: NpmPageScriptData | void, $: CheerioStatic) {
-  if (scriptData?.link) {
-    const a = $('a[href]');
-    for (let i = 0; i < a.length; i++) {
-      const el = $(a[i]);
-      const href = el.attr('href');
-      if (href && href.startsWith('##') && href.length > 2) {
-        const decrypted = scriptData.link[href.slice(2)];
-        if (decrypted) {
-          el.attr('href', decrypted);
-        }
-      }
-    }
-  }
+  const dom = $('article');
+  if (!dom.length) return;
+
+  const niDom = dom.find('[data-ni]');
+  if (!niDom) return;
+  const _ni = niDom.attr('data-ni');
+  if (!_ni) return;
+  dom.find('[data-href]').each((_, el) => {
+    const elem = $(el);
+    const encryptedHref = elem.attr('data-href');
+    if (!encryptedHref) return;
+    elem.attr('href',
+      AES.decrypt(encryptedHref, Utf8.parse('0ast0t25-fb94-4900-9a35-be2c8f37bec4'), {
+        iv: Utf8.parse(String(_ni.length * 123)),
+      }).toString(Utf8));
+    elem.removeAttr('data-href');
+  });
 }
 
 function fixImages($: CheerioStatic) {
@@ -120,17 +91,11 @@ export const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   }
   const $ = res.meta.doc;
 
-  // parse data from inline scripts
-  const {scriptData, scripts} = parseScriptData($);
-
   // fix headings
   fixHeadings($);
 
-  // decrypt contents
-  decryptContents(scriptData, $);
-
   // decrypt links
-  decryptLinks(scriptData, $);
+  decryptLinks($);
 
   // fix img src with data-src
   fixImages($);
@@ -146,9 +111,7 @@ export const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   $('#biz_content').remove();
   $('#biz_item').remove();
   $('#wxcode_box').remove();
-
-  // remove all scripts
-  scripts.remove();
+  $('.footer-links').remove();
 
   return res;
 };
