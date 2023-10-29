@@ -39,7 +39,7 @@ function skipExternalLink(
   const url = res.url;
   if (!url.startsWith(`http://${prefix}/`) &&
     !url.startsWith(`https://${prefix}/`) &&
-    element?.is('a')) {
+    (element?.is('a') || element?.is('iframe'))) {
     return;
   }
   return res;
@@ -80,7 +80,7 @@ lifeCycle.processAfterDownload.push((res) => {
 });
 
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
-options.maxDepth = 4;
+options.maxDepth = 12;
 options.concurrency = 12;
 options.initialUrl = initialUrl;
 options.req.headers = {
