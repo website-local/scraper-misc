@@ -1,14 +1,15 @@
-import {
+import type {
   DownloadResource,
   ProcessResourceAfterDownloadFunc,
   SubmitResourceFunc
 } from 'website-scrap-engine/lib/life-cycle/types';
-import {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
 import {parseHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
-import {CheerioStatic} from 'website-scrap-engine/lib/types';
+import type {CheerioStatic} from 'website-scrap-engine/lib/types';
 import AES from 'crypto-js/aes';
 import Utf8 from 'crypto-js/enc-utf8';
+import {keys} from './keys';
 
 function fixHeadings($: CheerioStatic) {
   // TODO: this might be useless now
@@ -45,9 +46,13 @@ _nd:
 (()=>{if(!_hr.includes('nodejs.cn'))return; _t.setAttribute('href',
 _cd(_t2,_cp('0ast0t25-fb94-4900-9a35-be2c8f37bec4'), {iv:_cp(_ni.length*123), }).toString(_cu)); })()
  */
-function decryptLinks($: CheerioStatic) {
+function decryptLinks($: CheerioStatic, host: string) {
 
-  const dom = $('article');
+  const encryptKey = keys[host];
+  if (!encryptKey) {
+    return;
+  }
+  const dom = $('body');
   if (!dom.length) return;
 
   const niDom = dom.find('[data-ni]');
@@ -59,7 +64,7 @@ function decryptLinks($: CheerioStatic) {
     const encryptedHref = elem.attr('data-href');
     if (!encryptedHref) return;
     elem.attr('href',
-      AES.decrypt(encryptedHref, Utf8.parse('0ast0t25-fb94-4900-9a35-be2c8f37bec4'), {
+      AES.decrypt(encryptedHref, Utf8.parse(encryptKey), {
         iv: Utf8.parse(String(_ni.length * 123)),
       }).toString(Utf8));
     elem.removeAttr('data-href');
@@ -95,7 +100,7 @@ export const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   fixHeadings($);
 
   // decrypt links
-  decryptLinks($);
+  decryptLinks($, res.uri?.host() || '');
 
   // fix img src with data-src
   fixImages($);
