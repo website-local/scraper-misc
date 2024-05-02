@@ -40,7 +40,7 @@ const HOST = 'nodejs.cn',
   PROTOCOL = 'https',
   URL_PREFIX = `${PROTOCOL}://${HOST}`;
 
-const defaultApiPath = 'dist/latest-v20.x/docs/api';
+const defaultApiPath = 'api/v22';
 
 const linkRedirectFunc = async (
   link: string,
@@ -140,7 +140,7 @@ const dropResource: ProcessResourceBeforeDownloadFunc = (
 ): Resource => {
   const api = options?.meta?.nodeApiPath || defaultApiPath;
   const shouldDrop = !(res.uri?.host() === HOST &&
-      res.uri.path().startsWith('/dist/latest-v')) ||
+      res.uri.path().startsWith('/api/')) ||
     res.uri.path() === `/${api}/static/inject.css` ||
     res.uri.path() === `/${api}/static/favicon.png` ||
     res.uri.path() === `/${api}/static/inject.js`;
@@ -206,6 +206,7 @@ const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   // remove all scripts
   $('script').remove();
   $('.wwads-cn,.wwads-horizontal').remove();
+  $('#pagead2').remove();
   $('a[href="/"]').remove();
   $('a[href*="aliyun.com"]').remove();
   $('a[href="/search"]').addClass('link-to-search');
@@ -217,6 +218,7 @@ const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   // style sheet, not needed since we re-implemented it
   $('link[rel="stylesheet"]').remove();
   $('link[rel="canonical"]').remove();
+  $('#apicontent').removeAttr('style');
   const api = options?.meta?.nodeApiPath as string | void || defaultApiPath;
   // style for page and prism.js
   // language=HTML

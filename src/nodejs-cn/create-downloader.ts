@@ -4,7 +4,7 @@ import {mkdirpSync as mkdir} from 'mkdirp';
 import {SingleThreadDownloader} from 'website-scrap-engine/lib/downloader';
 import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 
-const defaultApiPath = 'dist/latest-v20.x/docs/api';
+const defaultApiPath = 'api/v22';
 
 export default function createDownloader(
   overrideOptions: Partial<StaticDownloadOptions>
