@@ -962,7 +962,8 @@ kbd {
   display: block;
 }
 
-.js-flavor-selector {
+.js-flavor-selector,
+.js-flavor-toggle {
   -webkit-appearance: none;
   appearance: none;
   float: right;
@@ -975,14 +976,18 @@ kbd {
   cursor: pointer;
   margin: 0;
 }
-.js-flavor-selector:checked {
+.js-flavor-selector:checked,
+.js-flavor-toggle:checked {
   background-image: url("data:image/svg+xml,%3c!-- * Font Awesome Free 5.15.2 by @fontawesome - https://fontawesome.com * License - https://fontawesome.com/license/free - CC BY 4.0 --%3e %3csvg xmlns='http://www.w3.org/2000/svg' height='384' width='2719'%3e%3cdefs%3e%3cpath d='M-136.321-230.336h2994.365v653.401H-136.321z'/%3e%3c/defs%3e%3cpath d='M1383.326 0h-192c-106 0-192 86-192 192s86 192 192 192h192c106 0 192-86 192-192s-86-192-192-192zm0 320c-70.8 0-128-57.3-128-128 0-70.8 57.3-128 128-128 70.8 0 128 57.3 128 128 0 70.8-57.3 128-128 128z'/%3e%3ctext stroke-width='42' font-family='sans-serif' font-weight='lighter' font-size='490' y='370'%3eCJS%3c/text%3e%3ctext stroke-width='42' font-weight='lighter' font-family='sans-serif' font-size='490' y='370' x='1682'%3eESM%3c/text%3e%3c/svg%3e")
 }
 .js-flavor-selector:not(:checked) ~ .mjs,
-.js-flavor-selector:checked ~ .cjs {
+.js-flavor-selector:checked ~ .cjs,
+.js-flavor-toggle:not(:checked) ~ .mjs,
+.js-flavor-toggle:checked ~ .cjs {
   display: none;
 }
-.dark-mode .js-flavor-selector {
+.dark-mode .js-flavor-selector,
+.dark-mode .js-flavor-toggle {
   filter: invert(1);
 }
 
@@ -1263,6 +1268,14 @@ body {
   width: 48%;
   margin-left: 3%
 }
+
+.p-en {
+  opacity: 0.6;
+  border-top: 1px dashed rgb(62, 122, 56);
+  padding-top: 5px;
+}
+.p-en.p-off {display:none !important;}
+.p-en::first-letter {font-size:0 !important;line-height:0 !important;}
 
 /** endregion nodejs style */
 

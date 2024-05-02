@@ -282,6 +282,36 @@
   }
 }();
 
+!function () {
+  var ps = document.getElementsByTagName('p'),
+    i = 0, len = ps.length, el = ps[i];
+  for (;i < len; i++) {
+    el = ps[i];
+
+    if (/^\s*¥/.test(el.innerHTML)) {
+      el.className += ' p-off p-en';
+      if (el.previousElementSibling && el.previousElementSibling.tagName &&
+      (
+        'P' === el.previousElementSibling.tagName ||
+        'H' === el.previousElementSibling.tagName[0]
+      )) {
+        el.previousElementSibling.onclick = toggleEn;
+      }
+    }
+  }
+  function toggleEn(ev) {
+    var e = ev.target;
+
+    e = e.nextElementSibling;
+    if (e.className.includes('p-off')) {
+      e.className = e.className.replace('p-off', '');
+    } else {
+      e.className += ' p-off';
+    }
+
+  }
+} ();
+
 /* PrismJS 1.20.0 */
 /**
  * Prism: Lightweight, robust, elegant syntax highlighting
