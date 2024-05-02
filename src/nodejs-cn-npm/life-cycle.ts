@@ -61,9 +61,30 @@ function fixBadNpmLink(url: string): string {
   return url;
 }
 
+function skipBadUrl(url: string): string | void {
+  if (!url) {
+    return url;
+  }
+  // protocol not supported, skipping pathnamme pathnamme:///pst/enron.pst
+  if (url.startsWith('pathnamme:') ||
+    // protocol not supported, skipping hhttps hhttps://support.microsoft.com/
+    url.startsWith('hhttps:') ||
+    // protocol not supported, skipping mail mail:team@babeljs.io
+    url.startsWith('mail:') ||
+    // TypeError: Port "99%22" is not a valid port
+    url.includes(':99%22/') ||
+    // TypeError: Port "port" is not a valid port
+    // https://electron.nodejs.cn/docs/latest/api/command-line-switches/
+    url.startsWith('http://host:port/') ||
+    url.startsWith('http://localhost:3001/')) {
+    return;
+  }
+  return url;
+}
+
 const lifeCycle: ProcessingLifeCycle = defaultLifeCycle();
 lifeCycle.init.push(init);
-lifeCycle.linkRedirect.push(fixBadNpmLink);
+lifeCycle.linkRedirect.push(fixBadNpmLink, skipBadUrl);
 lifeCycle.processBeforeDownload.push(skipExternalLink);
 lifeCycle.processAfterDownload.unshift(preProcessHtml);
 lifeCycle.processAfterDownload.push((res) => {
