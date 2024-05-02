@@ -149,8 +149,10 @@
       }
     }
 
-    window.addEventListener('hashchange', updateHashes);
-    updateHashes();
+    if (linkWrapper) {
+      window.addEventListener('hashchange', updateHashes);
+      updateHashes();
+    }
   }
 
   // https://stackoverflow.com/a/30810322
