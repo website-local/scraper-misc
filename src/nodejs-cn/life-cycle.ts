@@ -1,4 +1,3 @@
-import {join} from 'path';
 import URI from 'urijs';
 import type {Resource} from 'website-scrap-engine/lib/resource';
 import {ResourceType} from 'website-scrap-engine/lib/resource';
