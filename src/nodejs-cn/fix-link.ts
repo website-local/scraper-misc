@@ -97,8 +97,6 @@ const getRedirectLocation = async (
       .replace(new RegExp(`${URL_PREFIX}/api/v\\d\\d/`),
         `${URL_PREFIX}/${options.meta.nodeApiPath}/`);
   }
-  // fake mdn links
-  link = link.replace('https://web.nodejs.cn/', 'https://developer.mozilla.org/');
   return link;
 };
 

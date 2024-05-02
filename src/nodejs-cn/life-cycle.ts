@@ -137,6 +137,8 @@ const linkRedirectFunc = async (
     u = u.path(redirect[u.path()]);
     link = u.toString();
   }
+  // fake mdn links
+  link = link.replace('https://web.nodejs.cn/', 'https://developer.mozilla.org/');
   return link;
 };
 
