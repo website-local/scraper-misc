@@ -120,6 +120,7 @@ export const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   $('.footer-links').remove();
   $('#pagead').remove();
   $('script[src^="https://cdn.wwads.cn/"]').remove();
-
+  $('script[src^="https://pagead2.googlesyndication.com"]').remove();
+  $('script[src*="sdk.51.la"]').remove();
   return res;
 };
