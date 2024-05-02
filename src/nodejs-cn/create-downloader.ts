@@ -9,7 +9,7 @@ const defaultApiPath = 'api/v22';
 export default function createDownloader(
   overrideOptions: Partial<StaticDownloadOptions>
 ): Promise<SingleThreadDownloader> {
-  let api = overrideOptions?.meta?.nodeApiPath as string || defaultApiPath;
+  const api = overrideOptions?.meta?.nodeApiPath as string || defaultApiPath;
   if (api !== defaultApiPath) {
     overrideOptions.initialUrl = [`http://nodejs.cn/${api}/`];
   }
@@ -17,9 +17,9 @@ export default function createDownloader(
     new SingleThreadDownloader(path.join(__dirname, 'life-cycle'), overrideOptions);
   return downloader.init.then(() => {
     downloader.start();
-    if (overrideOptions?.meta?.replaceNodeApiPath) {
-      api = defaultApiPath;
-    }
+    // if (overrideOptions?.meta?.replaceNodeApiPath) {
+    //   api = 'api';
+    // }
     const staticPath: string = path.join(downloader.options.localRoot,
       'nodejs.cn', api, 'static');
     mkdir(staticPath);

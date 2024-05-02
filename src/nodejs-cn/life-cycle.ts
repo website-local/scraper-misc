@@ -99,10 +99,18 @@ const linkRedirectFunc = async (
   if (options?.meta?.nodeApiPath) {
     api = options.meta.nodeApiPath as string;
     if (link[0] === '/') {
-      link = link.replace(/^\/api\//, `/${api}/`);
+      if (link.match(/^\/api\/v\d\d\//)) {
+        link = link.replace(/^\/api\/v\d\d\//, `/${api}/`);
+      } else {
+        link = link.replace(/^\/api\//, `/${api}/`);
+      }
     } else {
-      link = link.replace(/^https?:\/\/nodejs.cn\/api\//,
-        `https://nodejs.cn/${api}/`);
+      const regexp = new RegExp(`^${URL_PREFIX}/api/v\\d\\d/`);
+      if (link.match(regexp)) {
+        link = link.replace(regexp, `/${api}/`);
+      } else {
+        link = link.replace(`${URL_PREFIX}/api/`, `/${api}/`);
+      }
     }
   }
   let u = URI(link);
@@ -143,7 +151,10 @@ const dropResource: ProcessResourceBeforeDownloadFunc = (
       res.uri.path().startsWith('/api/')) ||
     res.uri.path() === `/${api}/static/inject.css` ||
     res.uri.path() === `/${api}/static/favicon.png` ||
-    res.uri.path() === `/${api}/static/inject.js`;
+    res.uri.path() === `/${api}/static/inject.js` ||
+    res.uri.path() === '/api/static/inject.css' ||
+    res.uri.path() === '/api/static/favicon.png' ||
+    res.uri.path() === '/api/static/inject.js';
   if (shouldDrop) {
     res.shouldBeDiscardedFromDownload = true;
   }
@@ -263,27 +274,27 @@ const postProcessHtml = ($: CheerioStatic) => {
   return $;
 };
 
-const postProcessSavePath = (
-  res: DownloadResource,
-  submit: SubmitResourceFunc,
-  options: StaticDownloadOptions
-): DownloadResource => {
-  const api = options?.meta?.nodeApiPath;
-  // res.savePath = "nodejs.cn\api-v14\index.html"
-  // api = "api-v14"
-  if (api && typeof api === 'string' && options?.meta?.replaceNodeApiPath) {
-    const expectedPrefix = join(HOST, api);
-    if (res.savePath.startsWith(expectedPrefix)) {
-      res.savePath = res.savePath.replace(expectedPrefix, join(HOST, defaultApiPath));
-    }
-    if (res.redirectedSavePath &&
-      res.redirectedSavePath.startsWith(expectedPrefix)) {
-      res.redirectedSavePath = res.redirectedSavePath.replace(
-        expectedPrefix, join(HOST, defaultApiPath));
-    }
-  }
-  return res;
-};
+// const postProcessSavePath = (
+//   res: DownloadResource,
+//   submit: SubmitResourceFunc,
+//   options: StaticDownloadOptions
+// ): DownloadResource => {
+//   const api = options?.meta?.nodeApiPath;
+//   // res.savePath = "nodejs.cn\api-v14\index.html"
+//   // api = "api-v14"
+//   if (api && typeof api === 'string' && options?.meta?.replaceNodeApiPath) {
+//     const expectedPrefix = join(HOST, api);
+//     if (res.savePath.startsWith(expectedPrefix)) {
+//       res.savePath = res.savePath.replace(expectedPrefix, join(HOST, rootApiPath));
+//     }
+//     if (res.redirectedSavePath &&
+//       res.redirectedSavePath.startsWith(expectedPrefix)) {
+//       res.redirectedSavePath = res.redirectedSavePath.replace(
+//         expectedPrefix, join(HOST, rootApiPath));
+//     }
+//   }
+//   return res;
+// };
 
 const initNodeApiPathFromOptions = (
   pipeline: PipelineExecutor, downloader?: DownloaderWithMeta
@@ -304,7 +315,7 @@ lifeCycle.processBeforeDownload.push(
   dropResource, preProcess(preProcessResource));
 lifeCycle.processAfterDownload.unshift(preProcessHtml);
 lifeCycle.processAfterDownload.push(
-  processHtml(postProcessHtml), postProcessSavePath);
+  processHtml(postProcessHtml));
 
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
 options.logSubDir = HOST;

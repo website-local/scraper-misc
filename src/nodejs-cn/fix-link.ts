@@ -9,7 +9,7 @@ const KW_ARR_BEGIN = 'var arr = [',
   KW_ARR_INDEX_BEGIN = 'location.replace(arr[';
 
 const HOST = 'nodejs.cn',
-  PROTOCOL = 'http',
+  PROTOCOL = 'https',
   URL_PREFIX = `${PROTOCOL}://${HOST}`;
 
 const LOCATION_REPLACE_LITERAL = 'location.replace(\'',
