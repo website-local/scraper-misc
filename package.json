@@ -14,7 +14,7 @@
     "mkdirp": "^3.0.1",
     "tough-cookie": "^4.1.4",
     "urijs": "^1.19.11",
-    "website-scrap-engine": "^0.7.1"
+    "website-scrap-engine": "^0.7.2"
   },
   "devDependencies": {
     "@types/node": "^22.8.7",
