@@ -35,7 +35,7 @@ import {
   hardCodedRedirect,
   hardCodedRedirectFullPath,
   initNodeApiPath
-} from './fix-link';
+} from './fix-link.js';
 
 const HOST = 'nodejs.cn',
   PROTOCOL = 'https',
