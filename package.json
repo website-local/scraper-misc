@@ -27,7 +27,7 @@
   },
   "scripts": {
     "lint": "eslint --fix src",
-    "clean": "rimraf lib/*",
+    "clean": "node -e \"require('fs').rmSync('lib',{force:true,recursive:true})\"",
     "tsc": "tsc",
     "build": "npm run lint && npm run tsc && npm run copy",
     "copy": "node copy-src.js",
