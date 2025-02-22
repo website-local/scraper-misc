@@ -1,26 +1,26 @@
 import URI from 'urijs';
 import type {
   ProcessingLifeCycle
-} from 'website-scrap-engine/lib/life-cycle/types';
+} from 'website-scrap-engine/lib/life-cycle/types.js';
 import {
   defaultLifeCycle
-} from 'website-scrap-engine/lib/life-cycle/default-life-cycle';
+} from 'website-scrap-engine/lib/life-cycle/default-life-cycle.js';
 import {
   dropResource,
   processHtml,
   redirectFilter,
   requestRedirect,
   skipProcess
-} from 'website-scrap-engine/lib/life-cycle/adapters';
-import type {Resource} from 'website-scrap-engine/lib/resource';
-import { ResourceType} from 'website-scrap-engine/lib/resource';
+} from 'website-scrap-engine/lib/life-cycle/adapters.js';
+import type {Resource} from 'website-scrap-engine/lib/resource.js';
+import { ResourceType} from 'website-scrap-engine/lib/resource.js';
 import type {
   DownloadOptions
-} from 'website-scrap-engine/lib/options';
+} from 'website-scrap-engine/lib/options.js';
 import {
   defaultDownloadOptions
-} from 'website-scrap-engine/lib/options';
-import type {CheerioStatic} from 'website-scrap-engine/lib/types';
+} from 'website-scrap-engine/lib/options.js';
+import type {CheerioStatic} from 'website-scrap-engine/lib/types.js';
 
 export const HOST = 'www.electronjs.org';
 

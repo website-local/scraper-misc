@@ -2,14 +2,14 @@ import type {
   DownloadResource,
   ProcessResourceAfterDownloadFunc,
   SubmitResourceFunc
-} from 'website-scrap-engine/lib/life-cycle/types';
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
-import {parseHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
-import type {CheerioStatic} from 'website-scrap-engine/lib/types';
-import AES from 'crypto-js/aes';
-import Utf8 from 'crypto-js/enc-utf8';
-import {keys} from './keys';
+} from 'website-scrap-engine/lib/life-cycle/types.js';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
+import {parseHtml} from 'website-scrap-engine/lib/life-cycle/adapters.js';
+import type {CheerioStatic} from 'website-scrap-engine/lib/types.js';
+import AES from 'crypto-js/aes.js';
+import Utf8 from 'crypto-js/enc-utf8.js';
+import {keys} from './keys.js';
 
 function fixHeadings($: CheerioStatic) {
   // TODO: this might be useless now

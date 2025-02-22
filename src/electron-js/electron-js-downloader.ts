@@ -1,7 +1,7 @@
-import {SingleThreadDownloader} from 'website-scrap-engine/lib/downloader';
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import {SingleThreadDownloader} from 'website-scrap-engine/lib/downloader/single.js';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {CookieJar} from 'tough-cookie';
-import {HOST} from './life-cycle';
+import {HOST} from './life-cycle.js';
 import path from 'path';
 import HttpAgent, {HttpsAgent} from 'agentkeepalive';
 

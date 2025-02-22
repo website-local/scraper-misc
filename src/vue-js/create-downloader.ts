@@ -1,6 +1,6 @@
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import path from 'path';
-import {SingleThreadDownloader} from 'website-scrap-engine/lib/downloader';
+import {SingleThreadDownloader} from 'website-scrap-engine/lib/downloader/single.js';
 import HttpAgent, {HttpsAgent} from 'agentkeepalive';
 
 export default function createDownloader(

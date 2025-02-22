@@ -1,6 +1,6 @@
 import path from 'path';
-import {SingleThreadDownloader} from 'website-scrap-engine/lib/downloader';
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import {SingleThreadDownloader} from 'website-scrap-engine/lib/downloader/single.js';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 
 export default function createDownloader(
   overrideOptions: Partial<StaticDownloadOptions>

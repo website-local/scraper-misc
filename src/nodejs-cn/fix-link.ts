@@ -1,8 +1,8 @@
 import got from 'got';
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
-import {error as errorLogger} from 'website-scrap-engine/lib/logger/logger';
-import AES from 'crypto-js/aes';
-import Utf8 from 'crypto-js/enc-utf8';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
+import {error as errorLogger} from 'website-scrap-engine/lib/logger/logger.js';
+import AES from 'crypto-js/aes.js';
+import Utf8 from 'crypto-js/enc-utf8.js';
 
 const KW_ARR_BEGIN = 'var arr = [',
   KW_ARR_END = '];',

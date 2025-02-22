@@ -1,8 +1,8 @@
 import path from 'path';
 import {promises as fs} from 'fs';
 import {mkdirpSync as mkdir} from 'mkdirp';
-import {SingleThreadDownloader} from 'website-scrap-engine/lib/downloader';
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
+import {SingleThreadDownloader} from 'website-scrap-engine/lib/downloader/single.js';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 
 const defaultApiPath = 'api/v22';
 

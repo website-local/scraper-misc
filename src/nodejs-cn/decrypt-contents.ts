@@ -1,10 +1,10 @@
-import AES from 'crypto-js/aes';
-import Utf8 from 'crypto-js/enc-utf8';
+import AES from 'crypto-js/aes.js';
+import Utf8 from 'crypto-js/enc-utf8.js';
 import got from 'got';
 import type {HTTPError} from 'got';
-import {error as errorLogger, notFound} from 'website-scrap-engine/lib/logger/logger';
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
-import type {CheerioStatic} from 'website-scrap-engine/lib/types';
+import {error as errorLogger, notFound} from 'website-scrap-engine/lib/logger/logger.js';
+import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
+import type {CheerioStatic} from 'website-scrap-engine/lib/types.js';
 
 const separator = '-a0a-';
 // the real key is computed inside crypto-js using some kdf

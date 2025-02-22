@@ -1,22 +1,22 @@
-import type {Resource} from 'website-scrap-engine/lib/resource';
-import { ResourceType} from 'website-scrap-engine/lib/resource';
+import type {Resource} from 'website-scrap-engine/lib/resource.js';
+import { ResourceType} from 'website-scrap-engine/lib/resource.js';
 import type {
   ProcessingLifeCycle
-} from 'website-scrap-engine/lib/life-cycle/types';
-import {defaultLifeCycle} from 'website-scrap-engine/lib/life-cycle';
+} from 'website-scrap-engine/lib/life-cycle/types.js';
+import {defaultLifeCycle} from 'website-scrap-engine/lib/life-cycle/default-life-cycle.js';
 import type {
   DownloadOptions,
   StaticDownloadOptions
-} from 'website-scrap-engine/lib/options';
-import {defaultDownloadOptions,} from 'website-scrap-engine/lib/options';
-import type {Cheerio} from 'website-scrap-engine/lib/types';
-import {preProcessHtml} from './process-html';
+} from 'website-scrap-engine/lib/options.js';
+import {defaultDownloadOptions,} from 'website-scrap-engine/lib/options.js';
+import type {Cheerio} from 'website-scrap-engine/lib/types.js';
+import {preProcessHtml} from './process-html.js';
 import type {
   PipelineExecutor
-} from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
+} from 'website-scrap-engine/lib/life-cycle/pipeline-executor.js';
 import type {
   DownloaderWithMeta
-} from 'website-scrap-engine/lib/downloader/types';
+} from 'website-scrap-engine/lib/downloader/types.js';
 
 const initialUrl: string[] = [];
 

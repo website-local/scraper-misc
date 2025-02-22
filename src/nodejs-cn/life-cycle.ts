@@ -1,34 +1,34 @@
 import URI from 'urijs';
-import type {Resource} from 'website-scrap-engine/lib/resource';
-import {ResourceType} from 'website-scrap-engine/lib/resource';
-import {error as errorLogger} from 'website-scrap-engine/lib/logger/logger';
+import type {Resource} from 'website-scrap-engine/lib/resource.js';
+import {ResourceType} from 'website-scrap-engine/lib/resource.js';
+import {error as errorLogger} from 'website-scrap-engine/lib/logger/logger.js';
 import type {
   DownloadResource,
   ProcessingLifeCycle,
   ProcessResourceAfterDownloadFunc,
   ProcessResourceBeforeDownloadFunc,
   SubmitResourceFunc
-} from 'website-scrap-engine/lib/life-cycle/types';
-import {defaultLifeCycle} from 'website-scrap-engine/lib/life-cycle';
+} from 'website-scrap-engine/lib/life-cycle/types.js';
+import {defaultLifeCycle} from 'website-scrap-engine/lib/life-cycle/default-life-cycle.js';
 import {
   parseHtml,
   preProcess,
   processHtml,
   skipProcess
-} from 'website-scrap-engine/lib/life-cycle/adapters';
+} from 'website-scrap-engine/lib/life-cycle/adapters.js';
 import type {
   DownloadOptions,
   StaticDownloadOptions
-} from 'website-scrap-engine/lib/options';
+} from 'website-scrap-engine/lib/options.js';
 import {
   defaultDownloadOptions
-} from 'website-scrap-engine/lib/options';
-import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+} from 'website-scrap-engine/lib/options.js';
+import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types.js';
 import type {
   PipelineExecutor
-} from 'website-scrap-engine/lib/life-cycle/pipeline-executor';
-import type {DownloaderWithMeta} from 'website-scrap-engine/lib/downloader/types';
-import {decryptContent, decryptLinks} from './decrypt-contents';
+} from 'website-scrap-engine/lib/life-cycle/pipeline-executor.js';
+import type {DownloaderWithMeta} from 'website-scrap-engine/lib/downloader/types.js';
+import {decryptContent, decryptLinks} from './decrypt-contents.js';
 import {
   cache,
   cachedGetRedirectLocation,

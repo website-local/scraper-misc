@@ -1,19 +1,20 @@
 import URI from 'urijs';
-import type {ProcessingLifeCycle} from 'website-scrap-engine/lib/life-cycle/types';
-import {defaultLifeCycle} from 'website-scrap-engine/lib/life-cycle/default-life-cycle';
-import {processHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
+import type {ProcessingLifeCycle} from 'website-scrap-engine/lib/life-cycle/types.js';
+import {defaultLifeCycle} from 'website-scrap-engine/lib/life-cycle/default-life-cycle.js';
+import {processHtml} from 'website-scrap-engine/lib/life-cycle/adapters.js';
 import {
   defaultDownloadOptions
-} from 'website-scrap-engine/lib/options';
-import type {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
-import type {StaticDownloadOptions,
+} from 'website-scrap-engine/lib/options.js';
+import type {Resource, ResourceType} from 'website-scrap-engine/lib/resource.js';
+import type {
+  StaticDownloadOptions,
   DownloadOptions
-} from 'website-scrap-engine/lib/options';
+} from 'website-scrap-engine/lib/options.js';
 import type {
   DownloadResource,
   SubmitResourceFunc
-} from 'website-scrap-engine/lib/life-cycle/types';
-import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
+} from 'website-scrap-engine/lib/life-cycle/types.js';
+import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types.js';
 
 const remapHosts: Set<string> = new Set([
   'cdn.jsdelivr.net',
