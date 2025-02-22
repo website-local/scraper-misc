@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "engines": {
-    "node": ">=12.16.0"
+    "node": ">=18.17.0"
   },
   "dependencies": {
     "@types/crypto-js": "^4.2.2",
