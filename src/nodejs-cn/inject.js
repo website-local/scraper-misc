@@ -1,6 +1,6 @@
 'use strict';
 /* global document window IntersectionObserver navigator */
-/* eslint-disable no-useless-escape */
+/* eslint-disable no-useless-escape, @typescript-eslint/no-unused-expressions */
 
 'use strict';
 

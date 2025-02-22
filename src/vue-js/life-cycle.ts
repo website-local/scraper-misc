@@ -3,11 +3,12 @@ import type {ProcessingLifeCycle} from 'website-scrap-engine/lib/life-cycle/type
 import {defaultLifeCycle} from 'website-scrap-engine/lib/life-cycle/default-life-cycle';
 import {processHtml} from 'website-scrap-engine/lib/life-cycle/adapters';
 import {
-  defaultDownloadOptions,
+  defaultDownloadOptions
+} from 'website-scrap-engine/lib/options';
+import type {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
+import type {StaticDownloadOptions,
   DownloadOptions
 } from 'website-scrap-engine/lib/options';
-import {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
-import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options';
 import type {
   DownloadResource,
   SubmitResourceFunc

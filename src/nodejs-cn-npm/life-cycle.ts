@@ -1,4 +1,5 @@
-import {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
+import type {Resource} from 'website-scrap-engine/lib/resource';
+import { ResourceType} from 'website-scrap-engine/lib/resource';
 import type {
   ProcessingLifeCycle
 } from 'website-scrap-engine/lib/life-cycle/types';

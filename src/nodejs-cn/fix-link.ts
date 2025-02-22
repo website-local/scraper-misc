@@ -81,7 +81,7 @@ const getRedirectLocation = async (
           try {
             link = AES.decrypt(encrypted, WINDOW_LINK_DECRYPT_KEY).toString(Utf8);
           } catch (e) {
-            errorLogger.warn('Error decrypting link', link, html);
+            errorLogger.warn('Error decrypting link', link, html, e);
           }
         } else {
           errorLogger.warn('Unknown redirect result format', link, html);

@@ -12,10 +12,13 @@ import {
   requestRedirect,
   skipProcess
 } from 'website-scrap-engine/lib/life-cycle/adapters';
-import {Resource, ResourceType} from 'website-scrap-engine/lib/resource';
-import {
-  defaultDownloadOptions,
+import type {Resource} from 'website-scrap-engine/lib/resource';
+import { ResourceType} from 'website-scrap-engine/lib/resource';
+import type {
   DownloadOptions
+} from 'website-scrap-engine/lib/options';
+import {
+  defaultDownloadOptions
 } from 'website-scrap-engine/lib/options';
 import type {CheerioStatic} from 'website-scrap-engine/lib/types';
 

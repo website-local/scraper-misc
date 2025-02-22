@@ -16,10 +16,12 @@ import {
   processHtml,
   skipProcess
 } from 'website-scrap-engine/lib/life-cycle/adapters';
-import {
-  defaultDownloadOptions,
+import type {
   DownloadOptions,
   StaticDownloadOptions
+} from 'website-scrap-engine/lib/options';
+import {
+  defaultDownloadOptions
 } from 'website-scrap-engine/lib/options';
 import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types';
 import type {
@@ -85,7 +87,7 @@ const linkRedirectFunc = async (
         // log the error and pass on since links can be broken
         errorLogger.warn(
           'Broken redirected link', link,
-          'with text', elem?.text(), 'from', parent?.rawUrl);
+          'with text', elem?.text(), 'from', parent?.rawUrl, e);
         return;
       }
     }
