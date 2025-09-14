@@ -10,6 +10,7 @@ export default function createDownloader(
   overrideOptions: Partial<StaticDownloadOptions>
 ): Promise<SingleThreadDownloader> {
   const downloader: SingleThreadDownloader =
-    new SingleThreadDownloader(path.join(__dirname, 'life-cycle'), overrideOptions);
+    new SingleThreadDownloader(
+      'file://' + path.join(__dirname, 'life-cycle.js'), overrideOptions);
   return downloader.init.then(() => downloader);
 }
