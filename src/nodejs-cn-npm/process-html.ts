@@ -7,6 +7,7 @@ import type {StaticDownloadOptions} from 'website-scrap-engine/lib/options.js';
 import {ResourceType} from 'website-scrap-engine/lib/resource.js';
 import {parseHtml} from 'website-scrap-engine/lib/life-cycle/adapters.js';
 import type {CheerioStatic} from 'website-scrap-engine/lib/types.js';
+import {error} from 'website-scrap-engine/lib/logger/logger.js';
 import AES from 'crypto-js/aes.js';
 import Utf8 from 'crypto-js/enc-utf8.js';
 import {keys} from './keys.js';
@@ -63,11 +64,19 @@ function decryptLinks($: CheerioStatic, host: string) {
     const elem = $(el);
     const encryptedHref = elem.attr('data-href');
     if (!encryptedHref) return;
-    elem.attr('href',
-      AES.decrypt(encryptedHref, Utf8.parse(encryptKey), {
-        iv: Utf8.parse(String(_ni.length * 123)),
-      }).toString(Utf8));
-    elem.removeAttr('data-href');
+    try {
+      elem.attr('href',
+        AES.decrypt(encryptedHref, Utf8.parse(encryptKey), {
+          iv: Utf8.parse(String(_ni.length * 123)),
+        }).toString(Utf8));
+      elem.removeAttr('data-href');
+    } catch (e) {
+      if (elem.is('button')) {
+        error.warn('Possible false positive decrypt', encryptedHref, host);
+      } else {
+        error.error('Decrypt failed', _ni, encryptedHref, host, e);
+      }
+    }
   });
 }
 
