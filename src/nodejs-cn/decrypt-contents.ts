@@ -97,7 +97,7 @@ export async function decryptContent(
     }
   }
 }
-const NI_REGEX = /^\s*window\._ni\s*=\s*["']([^'"]+)["']\s*;?\s*$/;
+const NI_REGEX = /^\s*window\._ni\s*=\s*["']([^'"]+)["']\s*;?\s*/;
 
 export function decryptLinks($: CheerioStatic, url: string): void {
   let ni = '';
