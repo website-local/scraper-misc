@@ -17,18 +17,18 @@ import type {
 import type {
   DownloaderWithMeta
 } from 'website-scrap-engine/lib/downloader/types.js';
+import URI from 'urijs';
+import {hostnames} from "./keys.js";
 
 const initialUrl: string[] = [];
 
 function init(
   pipeline: PipelineExecutor, downloader?: DownloaderWithMeta
 ) {
-  const prefix = downloader?.options.meta.prefix as string;
-  if (!prefix) {
-    throw new TypeError('init: meta.prefix is required, example val: eslint.nodejs.cn');
+  for (const hostname of hostnames) {
+    const url = `https://${hostname}/`;
+    initialUrl.push(url);
   }
-  const url = `https://${prefix}/`;
-  initialUrl.push(url);
 }
 
 function skipExternalLink(
@@ -36,10 +36,9 @@ function skipExternalLink(
   parent: Resource | null,
   options: StaticDownloadOptions
 ) {
-  const prefix = options.meta.prefix as string;
-  const url = res.url;
-  if (!url.startsWith(`http://${prefix}/`) &&
-    !url.startsWith(`https://${prefix}/`) &&
+  const uri = res.uri || URI(res.url);
+  const host = uri.host();
+  if (!hostnames.has(host) &&
     (element?.is('a') || element?.is('iframe'))) {
     return;
   }
