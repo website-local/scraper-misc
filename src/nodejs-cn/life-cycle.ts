@@ -220,6 +220,7 @@ const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   // remove all scripts
   $('script').remove();
   $('.wwads-cn,.wwads-horizontal').remove();
+  $('a[href*="crmeb.net"]').remove();
   $('#pagead2').remove();
   $('a[href="/"]').remove();
   $('a[href*="aliyun.com"]').remove();
