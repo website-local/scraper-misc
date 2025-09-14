@@ -113,6 +113,8 @@ export const preProcessHtml: ProcessResourceAfterDownloadFunc = async (
   }).remove();
 
   $('#biz_nav').remove();
+  $('[style="opacity:0.1"]').removeAttr('style');
+  $('[style="opacity: 0.1"]').removeAttr('style');
   $('#biz_content').remove();
   $('#biz_item').remove();
   $('#wxcode_box').remove();
