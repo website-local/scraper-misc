@@ -71,12 +71,14 @@ function skipBadUrl(url: string): string | void {
     url.startsWith('hhttps:') ||
     // protocol not supported, skipping mail mail:team@babeljs.io
     url.startsWith('mail:') ||
+    url.startsWith('vscode:') ||
     // TypeError: Port "99%22" is not a valid port
     url.includes(':99%22/') ||
     // TypeError: Port "port" is not a valid port
     // https://electron.nodejs.cn/docs/latest/api/command-line-switches/
     url.startsWith('http://host:port/') ||
-    url.startsWith('http://localhost:3001/')) {
+    url.startsWith('http://localhost:3001/') ||
+    url.startsWith('http://localhost:/')) {
     return;
   }
   return url;
