@@ -6,25 +6,16 @@ import type {
 import {defaultLifeCycle} from 'website-scrap-engine/lib/life-cycle/default-life-cycle.js';
 import type {
   DownloadOptions,
-  StaticDownloadOptions
 } from 'website-scrap-engine/lib/options.js';
 import {defaultDownloadOptions,} from 'website-scrap-engine/lib/options.js';
 import type {Cheerio} from 'website-scrap-engine/lib/types.js';
 import {preProcessHtml} from './process-html.js';
-import type {
-  PipelineExecutor
-} from 'website-scrap-engine/lib/life-cycle/pipeline-executor.js';
-import type {
-  DownloaderWithMeta
-} from 'website-scrap-engine/lib/downloader/types.js';
 import URI from 'urijs';
-import {hostnames} from "./keys.js";
+import {hostnames} from './keys.js';
 
 const initialUrl: string[] = [];
 
-function init(
-  pipeline: PipelineExecutor, downloader?: DownloaderWithMeta
-) {
+function init() {
   for (const hostname of hostnames) {
     const url = `https://${hostname}/`;
     initialUrl.push(url);
@@ -33,8 +24,6 @@ function init(
 
 function skipExternalLink(
   res: Resource, element: Cheerio | null,
-  parent: Resource | null,
-  options: StaticDownloadOptions
 ) {
   const uri = res.uri || URI(res.url);
   const host = uri.host();
