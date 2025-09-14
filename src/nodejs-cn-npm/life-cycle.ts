@@ -67,7 +67,8 @@ function skipBadUrl(url: string): string | void {
     // https://electron.nodejs.cn/docs/latest/api/command-line-switches/
     url.startsWith('http://host:port/') ||
     url.startsWith('http://localhost:3001/') ||
-    url.startsWith('http://localhost:/')) {
+    url.startsWith('http://localhost:') ||
+    url.startsWith('http://localhost/')) {
     return;
   }
   return url;
