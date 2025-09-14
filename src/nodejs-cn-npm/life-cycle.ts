@@ -61,6 +61,7 @@ function skipBadUrl(url: string): string | void {
     // protocol not supported, skipping mail mail:team@babeljs.io
     url.startsWith('mail:') ||
     url.startsWith('vscode:') ||
+    url.startsWith('cursor:') ||
     // TypeError: Port "99%22" is not a valid port
     url.includes(':99%22/') ||
     // TypeError: Port "port" is not a valid port
