@@ -62,6 +62,9 @@ function skipBadUrl(url: string): string | void {
     url.startsWith('mail:') ||
     url.startsWith('vscode:') ||
     url.startsWith('cursor:') ||
+    url.startsWith('raycast:') ||
+    url.startsWith('MacConfig:') ||
+    url.startsWith('ttps:') ||
     // TypeError: Port "99%22" is not a valid port
     url.includes(':99%22/') ||
     // TypeError: Port "port" is not a valid port
