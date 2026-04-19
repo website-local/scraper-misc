@@ -9,6 +9,7 @@ import type {
 } from 'website-scrap-engine/lib/options.js';
 import {defaultDownloadOptions,} from 'website-scrap-engine/lib/options.js';
 import type {Cheerio} from 'website-scrap-engine/lib/types.js';
+import {createLog4jsLogger} from 'website-scrap-engine/lib/logger/log4js-adapter.js';
 import {preProcessHtml} from './process-html.js';
 import URI from 'urijs';
 import {hostnames} from './keys.js';
@@ -100,6 +101,7 @@ const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
 options.maxDepth = 12;
 options.concurrency = 12;
 options.initialUrl = initialUrl;
+options.createLogger = (opts) => createLog4jsLogger(opts.localRoot, opts.logSubDir);
 options.req.headers = {
   'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
     '(KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'

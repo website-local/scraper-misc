@@ -21,6 +21,7 @@ import {
   defaultDownloadOptions
 } from 'website-scrap-engine/lib/options.js';
 import type {CheerioStatic} from 'website-scrap-engine/lib/types.js';
+import {createLog4jsLogger} from 'website-scrap-engine/lib/logger/log4js-adapter.js';
 
 export const HOST = 'www.electronjs.org';
 
@@ -144,6 +145,7 @@ if (typeof options.req.timeout === 'object') {
   options.req.timeout.connect = 4670;
 }
 options.initialUrl = [`https://${HOST}/docs`];
+options.createLogger = (opts) => createLog4jsLogger(opts.localRoot, opts.logSubDir);
 options.req.headers = {
   'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
     '(KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'

@@ -28,6 +28,7 @@ import type {
   PipelineExecutor
 } from 'website-scrap-engine/lib/life-cycle/pipeline-executor.js';
 import type {DownloaderWithMeta} from 'website-scrap-engine/lib/downloader/types.js';
+import {createLog4jsLogger} from 'website-scrap-engine/lib/logger/log4js-adapter.js';
 import {decryptContent, decryptLinks} from './decrypt-contents.js';
 import {
   cache,
@@ -326,6 +327,7 @@ options.logSubDir = HOST;
 options.maxDepth = 5;
 options.concurrency = 12;
 options.initialUrl = [URL_PREFIX + '/' + defaultApiPath + '/'];
+options.createLogger = (opts) => createLog4jsLogger(opts.localRoot, opts.logSubDir);
 options.req.headers = {
   'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
     '(KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'

@@ -15,6 +15,7 @@ import type {
   SubmitResourceFunc
 } from 'website-scrap-engine/lib/life-cycle/types.js';
 import type {Cheerio, CheerioStatic} from 'website-scrap-engine/lib/types.js';
+import {createLog4jsLogger} from 'website-scrap-engine/lib/logger/log4js-adapter.js';
 
 const remapHosts: Set<string> = new Set([
   'cdn.jsdelivr.net',
@@ -199,6 +200,7 @@ lifeCycle.processAfterDownload.unshift(processHtml(preProcessHtml));
 const options: DownloadOptions = defaultDownloadOptions(lifeCycle);
 options.maxDepth = 8;
 options.concurrency = 16;
+options.createLogger = (opts) => createLog4jsLogger(opts.localRoot, opts.logSubDir);
 options.req.headers = {
   'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
     '(KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36'
