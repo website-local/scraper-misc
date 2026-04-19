@@ -6,6 +6,7 @@
     "lib": ["es2019"],
     "sourceMap": true,
     "newLine": "lf",
+    "rootDir": "src",
     "outDir": "lib",
     "declaration": true,
     "esModuleInterop": true,
