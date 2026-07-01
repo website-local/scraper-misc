@@ -19,7 +19,7 @@
     "website-scrap-engine": "^0.9.0"
   },
   "devDependencies": {
-    "@types/node": "^26.0.1",
+    "@types/node": "^26.1.0",
     "@types/tough-cookie": "^4.0.5",
     "@types/urijs": "^1.19.26",
     "@typescript-eslint/eslint-plugin": "^8.62.1",
